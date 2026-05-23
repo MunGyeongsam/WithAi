@@ -2,12 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Love2D: Run via task",
+            "name": "Love2D: Run run.bat (F5)",
             "type": "node",
             "request": "launch",
-            "runtimeExecutable": "echo",
-            "args": [
-                "Use the task: Love2D: Run project"
+            "preLaunchTask": "Run run.bat",
+            "runtimeExecutable": "cmd",
+            "runtimeArgs": [
+                "/c",
+                "echo Game finished."
             ]
         }
     ]

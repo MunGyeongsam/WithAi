@@ -4,8 +4,29 @@
         {
             "label": "Love2D: Run project",
             "type": "shell",
-            "command": "love .",
-            "group": "build",
+            "command": "${workspaceFolder}/love-11.5-win64/lovec.exe",
+            "args": [
+                "${workspaceFolder}/project/src"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Love2D: Run project (Global)",
+            "type": "shell",
+            "command": "love",
+            "args": [
+                "${workspaceFolder}/project/src"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Run run.bat",
+            "type": "shell",
+            "command": "${workspaceFolder}/run.bat",
             "problemMatcher": []
         },
         {
