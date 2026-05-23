@@ -61,6 +61,7 @@
 | 파일 | 용도 |
 |------|------|
 | [cheatsheet.md](cheatsheet.md) | Lua ↔ C/C# 빠른 비교표 |
+| [lua_builtin_index.md](lua_builtin_index.md) | Lua 5.1 기본 함수/표준 라이브러리 색인 |
 | [exercises/](exercises/) | 챕터별 연습문제 정답 코드 |
 
 ---
