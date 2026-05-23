@@ -320,3 +320,20 @@ end
 ---
 
 [← 이전: 13. 입력 처리](13_input.md) | [다음: 15. 게임 루프 & 상태머신 →](15_game_loop_pattern.md)
+
+## 모범 답안
+
+### 14-1
+`SoundManager.sounds[name] = {src=Source, volume=1}` 구조로 관리하고, `play`는 `clone()` 후 재생하면 중복 재생이 가능하다.
+
+### 14-2
+`love.sound.newSoundData`로 샘플을 채운 뒤 `love.audio.newSource(data)`로 재생한다.
+- 피격음: 짧은 white-noise
+- 코인음: 시간에 따라 주파수 증가하는 sine
+- 폭발음: noise * (1 - t)
+
+### 14-3
+프레임 인덱스 `frame = floor(animTime * fps) % 4 + 1`, 이동 중일 때만 `animTime` 증가.
+
+### 14-4
+`love.filesystem.write/read` 기반으로 직렬화/역직렬화 함수를 만들고, 파일이 없으면 `defaults`를 반환한다.

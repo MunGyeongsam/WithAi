@@ -294,3 +294,31 @@ local data, err = safeParse("invalid!!!")
 ---
 
 [← 이전: 19. ECS 패턴](19_ecs_intro.md) | [다음: 21. 성능 최적화 →](21_performance.md)
+
+## 모범 답안
+
+### 20-1
+```lua
+local function safeParse(s)
+    return xpcall(function()
+        local out = {}
+        for pair in s:gmatch("[^,]+") do
+            local k, v = pair:match("^%s*([%w_]+)%s*=%s*([%w_]+)%s*$")
+            assert(k, "invalid token: " .. pair)
+            out[k] = tonumber(v) or v
+        end
+        return out
+    end, function(err)
+        return "파싱 에러: " .. tostring(err)
+    end)
+end
+```
+
+### 20-2
+`logError(err)`에서 timestamp + traceback을 `error.log`에 append하고, 라인 100개 초과 시 오래된 로그를 잘라낸다.
+
+### 20-3
+시스템 실행은 `xpcall(system.update, debug.traceback, dt)`로 감싸고 실패한 시스템만 건너뛴다.
+
+### 20-4
+에러 발생 시 `state = "safe_mode"`로 전환, 화면에 메시지 표시, 특정 키 입력 시 메뉴 상태로 복귀.

@@ -338,3 +338,25 @@ end
 ---
 
 [← 이전: 20. 에러 처리](20_error_handling.md) | [다음: 22. C API 개요 →](22_c_api_overview.md)
+
+## 모범 답안
+
+### 21-1
+`profile[name] = elapsed_ms`를 프레임마다 갱신하고, draw에서 막대 길이 `elapsed / budget`로 시각화한다.
+
+### 21-2
+```lua
+local kb = collectgarbage("count")
+love.graphics.print(string.format("Mem: %.1f KB", kb), 10, 10)
+```
+풀링 사용 시 톱니형 메모리 변동과 GC 스파이크가 줄어든다.
+
+### 21-3
+개선 포인트:
+- `sqrt` 대신 거리 제곱 비교
+- 루프 내 테이블 생성 제거 (`dir` 재사용/직접 계산)
+- 디버그 `print` 제거 또는 샘플링 로그
+- `math` 함수 로컬화
+
+### 21-4
+엔티티 수 단계별로 5초 평균 FPS를 기록하고, 시스템별 프로파일 합계로 병목 구간(update/draw/collision)을 분리해서 보고한다.

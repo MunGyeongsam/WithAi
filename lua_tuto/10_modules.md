@@ -302,3 +302,37 @@ effects.lua → require("player")   -- ⚠️
 ---
 
 [← 이전: 09. OOP 패턴](09_oop_patterns.md) | [다음: 11. LÖVE2D 생명주기 →](11_love2d_lifecycle.md)
+
+## 모범 답안
+
+### 10-1
+```lua
+local M = {}
+function M.clamp(v, mn, mx) return math.max(mn, math.min(mx, v)) end
+function M.lerp(a, b, t) return a + (b - a) * t end
+function M.distance(x1, y1, x2, y2)
+    local dx, dy = x2 - x1, y2 - y1
+    return math.sqrt(dx * dx + dy * dy)
+end
+function M.normalize(x, y)
+    local len = math.sqrt(x * x + y * y)
+    if len == 0 then return 0, 0 end
+    return x / len, y / len
+end
+return M
+```
+
+### 10-2
+`scoreManager`는 모듈 내부 `local score, high = 0, 0` 상태를 두고 `init/add/get/reset`를 노출하면 된다.
+
+### 10-3
+순환 의존이 있다 (`player -> weapon -> effects -> player`).
+해결: 공통 데이터/이벤트 버스를 분리하거나 `effects`가 `player`를 직접 require하지 않게 의존 방향을 단방향으로 바꾼다.
+
+### 10-4
+권장 구조:
+- `main.lua`
+- `scenes/{menu,game,gameover}.lua`
+- `entities/{player,enemy,bullet}.lua`
+- `systems/{collision,spawner,score}.lua`
+- `core/{input,assets,state}.lua`

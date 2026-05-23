@@ -345,3 +345,33 @@ local text = "Background: #FF0000, Text: #00FF00, Border: #0000FF"
 ---
 
 [← 이전: 03. 제어문](03_control_flow.md) | [다음: 05. 함수 →](05_functions.md)
+
+## 모범 답안
+
+### 4-1
+```lua
+local msg = string.format("[Wave %02d] Enemy spawned at (%.2f, %.2f) - HP: %d", wave, x, y, hp)
+print(msg)
+```
+
+### 4-2
+```lua
+for hex in text:gmatch("#%x%x%x%x%x%x") do
+    print(hex)
+end
+```
+
+### 4-3
+```lua
+local parts = {}
+for i = 1, 100 do
+    parts[i] = tostring(i)
+end
+local s = table.concat(parts, ", ")
+```
+
+### 4-4
+```lua
+local name, lv, cur, max = string.match("Player[Lv.15] HP:80/100", "([%a_]+)%[Lv%.(%d+)%]%sHP:(%d+)/(%d+)")
+print(name, tonumber(lv), tonumber(cur), tonumber(max))
+```

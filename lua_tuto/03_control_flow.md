@@ -400,3 +400,36 @@ C의 `for (int i = 0; i < 10; i++)`를 Lua로 변환하라.
 ---
 
 [← 이전: 02. 타입 & 변수](02_types_and_variables.md) | [다음: 04. 문자열 →](04_strings.md)
+
+## 모범 답안
+
+### 3-1
+```lua
+local speedByType = { slime = 50, bat = 150, boss = 30 }
+local speed = speedByType[enemyType] or 100
+```
+
+### 3-2
+```lua
+for i = 1, 20 do
+    if i % 3 == 0 then
+        print(i)
+    end
+end
+```
+
+### 3-3
+```lua
+local a = true and false or "fallback" -- fallback
+local b = true and 0 or "fallback"     -- 0
+local c = nil and "yes" or "no"        -- no
+print(a, b, c)
+```
+`and/or`는 불리언이 아니라 피연산자 값을 반환한다.
+
+### 3-4
+```lua
+for i = 0, 9 do
+    print(i)
+end
+```

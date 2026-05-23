@@ -293,3 +293,49 @@ print(#a, #b, #c)
 ---
 
 [← 이전: 05. 함수](05_functions.md) | [다음: 07. 테이블 심화 →](07_tables_advanced.md)
+
+## 모범 답안
+
+### 6-1
+```lua
+local function addItem(inv, item)
+    inv[#inv + 1] = item
+end
+
+local function removeItem(inv, index)
+    return table.remove(inv, index)
+end
+
+local function findItem(inv, item)
+    for i = 1, #inv do
+        if inv[i] == item then return i end
+    end
+    return nil
+end
+
+local function printInventory(inv)
+    for i = 1, #inv do
+        print(i, inv[i])
+    end
+end
+```
+
+### 6-2
+```lua
+table.sort(leaderboard, function(a, b)
+    return a.score > b.score
+end)
+```
+
+### 6-3
+일반적으로 `#a == 3`, `#c == 0`.
+`#b`는 중간에 `nil`이 있어 길이가 정의되지 않아 구현 의존적이다.
+
+### 6-4
+```lua
+local function swapRemove(t, i)
+    t[i] = t[#t]
+    t[#t] = nil
+end
+```
+`table.remove`는 순서를 보존하지만 뒤 요소들을 당겨 O(n), `swapRemove`는 순서를 포기하고 O(1)이다.

@@ -172,3 +172,37 @@ end
 ---
 
 [다음: 02. 타입 & 변수 & 스코프 →](02_types_and_variables.md)
+
+## 모범 답안
+
+### 1-1
+```lua
+function love.draw()
+    love.graphics.print("Lua version: " .. _VERSION, 10, 10)
+    love.graphics.print("LOVE version: " .. love._version, 10, 30)
+end
+```
+
+### 1-2
+```lua
+local x, y, r = 400, 300, 20
+
+function love.update(dt)
+    local speed = 200
+    if love.keyboard.isDown("left") then x = x - speed * dt end
+    if love.keyboard.isDown("right") then x = x + speed * dt end
+    if love.keyboard.isDown("up") then y = y - speed * dt end
+    if love.keyboard.isDown("down") then y = y + speed * dt end
+end
+
+function love.draw()
+    love.graphics.circle("fill", x, y, r)
+end
+```
+
+### 1-3
+```lua
+love.graphics.setColor(1, 0, 0)
+love.graphics.circle("fill", x, y, r)
+love.graphics.setColor(1, 1, 1)
+```

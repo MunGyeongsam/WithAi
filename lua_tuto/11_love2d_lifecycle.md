@@ -304,3 +304,35 @@ end
 ---
 
 [← 이전: 10. 모듈 시스템](10_modules.md) | [다음: 12. 그리기 →](12_drawing.md)
+
+## 모범 답안
+
+### 11-1
+```lua
+function love.conf(t)
+    t.window.width = 1024
+    t.window.height = 768
+    t.window.title = "My Shooter"
+    t.window.vsync = 1
+    t.modules.physics = false
+    t.modules.joystick = false
+end
+```
+
+### 11-2
+```lua
+local timer, n = 0, 0
+function love.update(dt)
+    timer = timer + dt
+    while timer >= 2 do
+        timer = timer - 2
+        n = n + 1
+    end
+end
+```
+
+### 11-3
+`love.keypressed("space")`로 단발 발사, `isDown("left"...)`로 연속 이동 구현.
+
+### 11-4
+`state = "menu" | "playing" | "gameover"`로 두고, `keypressed`에서 Enter/R 입력으로 전환한다.

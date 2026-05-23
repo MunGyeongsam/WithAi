@@ -274,3 +274,29 @@ Lua에서 `dot(x1, y1, x2, y2)` 형태로 호출할 수 있어야 한다.
 ---
 
 [← 이전: 21. 성능 최적화](21_performance.md) | [다음: 23. 미니 프로젝트 →](23_mini_project.md)
+
+## 모범 답안
+
+### 22-1
+스택 변화:
+1. `pushinteger(10)` -> `[10]`
+2. `pushstring("hello")` -> `[10, "hello"]`
+3. `pushinteger(20)` -> `[10, "hello", 20]`
+4. `remove(2)` -> `[10, 20]`
+5. `pushvalue(1)` -> `[10, 20, 10]`
+
+### 22-2
+`love.graphics.circle("fill", 400, 300, 50)` 호출 시 Lua 스택 인자는 순서대로 타입 문자열과 숫자 3개가 올라간다.
+C++ 바인딩 함수는 인덱스 1부터 순차적으로 읽고, 보통 반환값이 없으면 `return 0`이다.
+
+### 22-3
+```c
+static int l_dot(lua_State* L) {
+    double x1 = luaL_checknumber(L, 1);
+    double y1 = luaL_checknumber(L, 2);
+    double x2 = luaL_checknumber(L, 3);
+    double y2 = luaL_checknumber(L, 4);
+    lua_pushnumber(L, x1 * x2 + y1 * y2);
+    return 1;
+}
+```

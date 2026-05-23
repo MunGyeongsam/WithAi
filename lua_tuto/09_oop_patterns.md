@@ -165,15 +165,24 @@ boss 인스턴스 → Boss (여기서 발견! Enemy 버전은 호출 안 됨)
 
 ```lua
 local function isinstance(obj, class)
-    local mt = getmetatable(obj)
-    while mt do
-        if mt == class then return true end
-        local parent = getmetatable(mt)
-        if parent then
-            mt = parent.__index
-        else
-            mt = nil
+    -- 이 구현은 class 상속을 setmetatable(Child, {__index = Parent})
+    -- 형태로 연결했을 때 동작한다.
+    local current = getmetatable(obj)
+    while current do
+        if current == class then
+            return true
         end
+
+        local mt = getmetatable(current)
+        if not mt then
+            break
+        end
+
+        if type(mt.__index) ~= "table" then
+            break
+        end
+
+        current = mt.__index
     end
     return false
 end
@@ -328,3 +337,40 @@ buddy:learnTrick("sit")
 ---
 
 [← 이전: 08. 메타테이블](08_metatables.md) | [다음: 10. 모듈 시스템 →](10_modules.md)
+
+## 모범 답안
+
+### 9-1
+구현 핵심:
+- `Weapon:attack()`은 기본 데미지 반환
+- `Sword`는 `range` 필드 추가
+- `Staff:attack(mana)`는 마나가 부족하면 `nil, "not enough mana"` 반환
+
+### 9-2
+```lua
+local Serializable = {}
+function Serializable:serialize()
+    local parts = {}
+    for k, v in pairs(self) do
+        if type(v) ~= "function" then
+            parts[#parts + 1] = k .. "=" .. tostring(v)
+        end
+    end
+    table.sort(parts)
+    return table.concat(parts, ",")
+end
+```
+
+### 9-3
+`class()`에서 부모 메타테이블을 연결하고,
+```lua
+function cls:super(method, ...)
+    return base[method](self, ...)
+end
+```
+를 추가하면 된다.
+
+### 9-4
+비교 요약:
+- OOP: 책임 분산/확장 용이, 호출 간접비용 증가 가능
+- 데이터 중심: 순차 처리와 캐시 친화적, 구조 관리 규칙이 필요

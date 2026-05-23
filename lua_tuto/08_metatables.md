@@ -284,3 +284,48 @@ print(C.x)                -- ?
 ---
 
 [← 이전: 07. 테이블 심화](07_tables_advanced.md) | [다음: 09. OOP 패턴 →](09_oop_patterns.md)
+
+## 모범 답안
+
+### 8-1
+```lua
+function Vec2:length()
+    return math.sqrt(self.x * self.x + self.y * self.y)
+end
+
+function Vec2:normalized()
+    local len = self:length()
+    if len == 0 then return Vec2.new(0, 0) end
+    return Vec2.new(self.x / len, self.y / len)
+end
+
+function Vec2:dot(other)
+    return self.x * other.x + self.y * other.y
+end
+
+function Vec2:__tostring()
+    return string.format("Vec2(%.2f, %.2f)", self.x, self.y)
+end
+```
+
+### 8-2
+```lua
+local function createConfig(defaults)
+    local t = {}
+    return setmetatable(t, {
+        __index = defaults,
+        __newindex = function(self, k, v)
+            print("[warn] override:", k, v)
+            rawset(self, k, v)
+        end,
+    })
+end
+```
+
+### 8-3
+`__index`에서 카운트를 올리고 실제 `data[k]`를 반환한다. `proxy:getAccessCount(k)`는 별도 메서드로 제공한다.
+
+### 8-4
+첫 출력은 `3 2 1`.
+`B.x = 10` 후 `C.x`는 `10`.
+`A.x = 20`이어도 `B.x`가 이미 있으므로 `C.x`는 계속 `10`.

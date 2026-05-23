@@ -299,3 +299,27 @@ end
 ---
 
 [← 이전: 11. LÖVE2D 생명주기](11_love2d_lifecycle.md) | [다음: 13. 입력 처리 →](13_input.md)
+
+## 모범 답안
+
+### 12-1
+`love.draw`에서 `setColor` + `circle`, `rectangle`, `polygon`, 반복문으로 격자선을 그리면 된다.
+
+### 12-2
+```lua
+local angle = 0
+function love.update(dt) angle = angle + dt end
+function love.draw()
+    love.graphics.push()
+    love.graphics.translate(400, 300)
+    love.graphics.rotate(angle)
+    love.graphics.rectangle("fill", -40, -20, 80, 40)
+    love.graphics.pop()
+end
+```
+
+### 12-3
+클릭 시 파티클 생성, update에서 `y -= speed*dt`, `life -= dt`, draw에서 `alpha = life/maxLife`와 `setBlendMode("add")` 사용.
+
+### 12-4
+우주선은 삼각형 머리 + 직사각형 몸체 + 뒤쪽 글로우 원으로 구성하면 된다.

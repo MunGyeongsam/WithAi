@@ -361,3 +361,24 @@ end
 ---
 
 [← 이전: 15. 게임 루프](15_game_loop_pattern.md) | [다음: 17. 충돌 처리 →](17_collision.md)
+
+## 모범 답안
+
+### 16-1
+정석 조합:
+- 적: 팩토리 함수 생성
+- 총알: 풀에서 `get/release`
+- 삭제: 배열 역순 순회 + swap-remove
+
+### 16-2
+스폰 예시:
+- 랜덤: `x=rand(0,w), y=-20`
+- 일렬 5: `for i=1,5 do x=gap*i end`
+- V자 7: 중앙 기준 좌우 대칭 오프셋
+- 원형 8: `angle=2*pi*(i-1)/8`
+
+### 16-3
+일반적으로 `table.remove` < `swap-remove` < `pool` 순으로 성능이 좋아진다.
+
+### 16-4
+셀 좌표 `(floor(x/cell), floor(y/cell))`를 키로 사용해 엔티티를 버킷에 넣고, draw에서 셀 테두리/개수/검사 대상 셀을 시각화한다.

@@ -295,3 +295,23 @@ WASD로 이동하고, 마우스 방향을 향하는 삼각형 "캐릭터"를 구
 ---
 
 [← 이전: 12. 그리기](12_drawing.md) | [다음: 14. 오디오 & 리소스 →](14_audio_and_assets.md)
+
+## 모범 답안
+
+### 13-1
+WASD로 `(dx,dy)`를 만들고 `player.angle = math.atan2(my - y, mx - x)`로 조준한다.
+
+### 13-2
+`isDown(1)` 동안 `charge = min(maxCharge, charge + dt)` 누적, 버튼을 떼는 순간 차지 비례 탄환 생성.
+
+### 13-3
+`bindings[action] = key` 테이블을 두고, "bind 대기 상태"에서 `love.keypressed(k)`가 들어오면 해당 액션에 저장한다.
+
+### 13-4
+```lua
+if dx ~= 0 and dy ~= 0 then
+    local inv = 1 / math.sqrt(2)
+    dx, dy = dx * inv, dy * inv
+end
+```
+정규화 전 속도는 `speed*sqrt(2)`, 정규화 후 `speed`.

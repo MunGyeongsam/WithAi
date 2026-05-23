@@ -418,3 +418,57 @@ print(t.player.stats.hp)   -- 100
 ---
 
 [← 이전: 06. 테이블 기초](06_tables_basics.md) | [다음: 08. 메타테이블 →](08_metatables.md)
+
+## 모범 답안
+
+### 7-1
+```lua
+local function deepCopy(src, seen)
+    if type(src) ~= "table" then return src end
+    seen = seen or {}
+    if seen[src] then return seen[src] end
+    local dst = {}
+    seen[src] = dst
+    for k, v in pairs(src) do
+        dst[deepCopy(k, seen)] = deepCopy(v, seen)
+    end
+    return setmetatable(dst, getmetatable(src))
+end
+```
+
+### 7-2
+핵심 구현:
+- `get()`: `pool[#pool]` 재사용 또는 새 생성
+- `release(p)`: 상태 초기화 후 `pool[#pool+1] = p`
+- `updateAll(dt)`: `active`를 역순 순회하며 `life <= 0`이면 release
+
+### 7-3
+```lua
+local function toSet(arr)
+    local s = {}
+    for i = 1, #arr do s[arr[i]] = true end
+    return s
+end
+
+local function union(a, b)
+    local r = {}
+    for k in pairs(a) do r[k] = true end
+    for k in pairs(b) do r[k] = true end
+    return r
+end
+```
+교집합/차집합도 같은 방식으로 키 존재 여부로 계산하면 된다.
+
+### 7-4
+```lua
+local function safeSet(t, value, ...)
+    local keys = {...}
+    local cur = t
+    for i = 1, #keys - 1 do
+        local k = keys[i]
+        if type(cur[k]) ~= "table" then cur[k] = {} end
+        cur = cur[k]
+    end
+    cur[keys[#keys]] = value
+end
+```

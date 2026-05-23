@@ -397,3 +397,26 @@ end
 ---
 
 [← 이전: 17. 충돌 처리](17_collision.md) | [다음: 19. ECS 패턴 입문 →](19_ecs_intro.md)
+
+## 모범 답안
+
+### 18-1
+```lua
+local co = coroutine.create(function()
+    for i = 3, 1, -1 do
+        print(i .. "...")
+        coroutine.yield(1.0)
+    end
+    print("GO!")
+end)
+```
+`yield`에 대기 시간을 넘기고 스케줄러에서 누적 `dt`로 재개한다.
+
+### 18-2
+보스 AI 코루틴에서 패턴 함수를 테이블에 두고 `patterns[love.math.random(#patterns)]()` 반복 호출.
+
+### 18-3
+트윈은 `ease(t)`와 함께 `scale/alpha/position/shake` 값을 시간 기반으로 보간한다.
+
+### 18-4
+타이핑 코루틴에서 문자 단위 출력, `{slow}/{fast}` 태그를 읽어 속도 변경, Space 입력 시 현재 줄 즉시 완성.

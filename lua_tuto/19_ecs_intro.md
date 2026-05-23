@@ -369,3 +369,23 @@ end
 ---
 
 [← 이전: 18. 코루틴](18_coroutines_for_games.md) | [다음: 20. 에러 처리 →](20_error_handling.md)
+
+## 모범 답안
+
+### 19-1
+필수 컴포넌트:
+- 플레이어: `position, velocity, playerTag`
+- 적: `position, velocity, enemyTag`
+- 총알: `position, velocity, bulletTag, lifetime`
+시스템: `input -> movement -> collision -> cleanup -> draw`.
+
+### 19-2
+`lifetime`: update에서 `remaining -= dt`, 0 이하면 destroy.
+`spawner`: interval 누적 후 factory 호출.
+`invincible`: 남은 시간 동안 피격 무시.
+
+### 19-3
+`movement -> collision`은 이동 후 충돌, `collision -> movement`는 이전 위치 기준 충돌이라 결과가 달라진다.
+
+### 19-4
+컴포넌트별 엔티티 인덱스(`index[comp][id]=true`)를 유지하면 쿼리 시 교집합만 계산해 전체 순회를 줄일 수 있다.

@@ -299,3 +299,51 @@ enemy.takeDamage(30)   -- 여기서 에러 발생. 왜?
 ---
 
 [← 이전: 04. 문자열](04_strings.md) | [다음: 06. 테이블 기초 →](06_tables_basics.md)
+
+## 모범 답안
+
+### 5-1
+```lua
+local player = {x = 100, y = 200, angle = 1.57}
+
+local function getPlayerInfo()
+    return player.x, player.y, player.angle
+end
+```
+
+### 5-2
+```lua
+local function map(t, fn)
+    local out = {}
+    for i = 1, #t do
+        out[i] = fn(t[i])
+    end
+    return out
+end
+```
+
+### 5-3
+```lua
+local function makeHealthBar(maxHp)
+    local hp = maxHp
+    return {
+        damage = function(amount)
+            hp = math.max(0, hp - amount)
+            return hp
+        end,
+        heal = function(amount)
+            hp = math.min(maxHp, hp + amount)
+            return hp
+        end,
+        getPercent = function()
+            return hp / maxHp
+        end,
+    }
+end
+```
+
+### 5-4
+```lua
+enemy:takeDamage(30)
+```
+`:` 문법은 첫 인자로 `self`를 자동 전달하므로 `enemy.takeDamage(30)`은 `self`가 잘못 들어가 에러가 난다.

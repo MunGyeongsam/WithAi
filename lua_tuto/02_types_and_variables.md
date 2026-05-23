@@ -249,3 +249,38 @@ if "false" then print("F") end
 ---
 
 [← 이전: 01. Intro](01_intro.md) | [다음: 03. 제어문 & 연산자 →](03_control_flow.md)
+
+## 모범 답안
+
+### 2-1
+예상 결과:
+- `number`
+- `number`
+- `string`
+- `nil`
+- `boolean`
+- `function`
+- `table`
+- `function`
+
+### 2-2
+```lua
+function createBullet(x, y)
+    local speed = 500
+    local dx = 0
+    local dy = -1
+    local bullet = {x = x, y = y, speed = speed, dx = dx, dy = dy}
+    return bullet
+end
+```
+
+### 2-3
+```lua
+local a, b, c = 10, 20, 30
+a, c = c, a
+print(a, b, c) -- 30, 20, 10
+```
+
+### 2-4
+출력되는 것은 `A`, `B`, `E`, `F`.
+Lua에서 false 판정은 `nil`, `false`만 해당한다.

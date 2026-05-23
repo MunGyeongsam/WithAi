@@ -343,3 +343,19 @@ end)
 ---
 
 [← 이전: 14. 오디오 & 리소스](14_audio_and_assets.md) | [다음: 16. 엔티티 관리 →](16_entity_management.md)
+
+## 모범 답안
+
+### 15-1
+씬 테이블 예시: `scenes.menu`, `scenes.game`, `scenes.gameover` 각각 `enter/update/draw/keypressed` 구현 후 `current = scenes.menu`로 전환.
+
+### 15-2
+상태 변수: `wave`, `enemiesAlive`, `cooldown`, `isVictory`.
+적이 0이면 `cooldown=3` 시작, 끝나면 다음 웨이브 생성, `wave>5`면 승리 처리.
+
+### 15-3
+`Timer.after/every`가 `id`를 반환하도록 하고 배열에서 해당 id를 비활성화하면 `cancel` 구현 가능.
+`tween`은 `from` 값을 저장하고 `t=elapsed/duration`으로 보간하면 된다.
+
+### 15-4
+게임 씬 유지 + 일시정지 씬 push, draw 시 스택 바닥부터 모두 그린 뒤 pause 오버레이를 마지막에 반투명으로 렌더링.
