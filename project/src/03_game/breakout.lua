@@ -180,6 +180,9 @@ function Breakout:loadLevel(level)
     self.level = level
     self.ballSpeed = levelInfo.ballSpeed or 380
     self.paddle.speed = levelInfo.paddleSpeed or 620
+    if self.mode and self.mode.applyLevelRules then
+        self.mode:applyLevelRules(self, levelInfo)
+    end
     self.theme = levelInfo.theme or self.theme
     self.bricks = makeBricks(self.width, self.height, levelInfo.layout)
     self.state = STATE.SERVE

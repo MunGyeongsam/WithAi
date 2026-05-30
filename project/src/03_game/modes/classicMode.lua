@@ -1,11 +1,13 @@
 local Combo = require("03_game.combo")
+local ModeBalance = require("03_game.modes.modeBalance")
 
 local ClassicMode = {}
 ClassicMode.__index = ClassicMode
 
-function ClassicMode.new()
+function ClassicMode.new(tuning)
     local self = setmetatable({}, ClassicMode)
-    self.comboConfig = {
+    self.tuning = tuning or ModeBalance.get("classic")
+    self.comboConfig = self.tuning.comboConfig or {
         windowSeconds = 1.8,
         stepMultiplier = 0.25,
         hitsPerStep = 4,
@@ -34,6 +36,11 @@ end
 
 function ClassicMode:onLevelTransition(game)
     Combo.reset(game.combo)
+end
+
+function ClassicMode:applyLevelRules(game, levelInfo)
+    local _ = game
+    local __ = levelInfo
 end
 
 function ClassicMode:awardBrickPoints(game, basePoints)

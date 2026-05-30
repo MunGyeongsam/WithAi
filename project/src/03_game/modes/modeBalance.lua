@@ -1,0 +1,44 @@
+local ModeBalance = {}
+
+ModeBalance.byId = {
+    classic = {
+        comboConfig = {
+            windowSeconds = 1.8,
+            stepMultiplier = 0.25,
+            hitsPerStep = 4,
+            maxMultiplier = 2.5,
+        },
+        levelClearBonusByLevel = {},
+        ballSpeedScaleByLevel = {},
+        paddleSpeedScaleByLevel = {},
+    },
+    combo_rush = {
+        comboConfig = {
+            windowSeconds = 1.1,
+            stepMultiplier = 0.35,
+            hitsPerStep = 3,
+            maxMultiplier = 3.2,
+        },
+        levelClearBonusByLevel = {
+            [1] = 220,
+            [2] = 320,
+            [3] = 450,
+        },
+        ballSpeedScaleByLevel = {
+            [1] = 1.04,
+            [2] = 1.08,
+            [3] = 1.12,
+        },
+        paddleSpeedScaleByLevel = {
+            [1] = 0.98,
+            [2] = 0.96,
+            [3] = 0.94,
+        },
+    },
+}
+
+function ModeBalance.get(modeId)
+    return ModeBalance.byId[modeId] or ModeBalance.byId.classic
+end
+
+return ModeBalance

@@ -11,6 +11,9 @@ end
 local mode = ComboRushMode.new()
 local game = {
     score = 0,
+    level = 1,
+    ballSpeed = 0,
+    paddle = {speed = 0},
 }
 
 mode:onReset(game)
@@ -31,8 +34,13 @@ mode:update(game, 2.0)
 assertEq(game.combo.count, 0, "timeout reset")
 
 game.score = 500
+game.level = 2
 mode:onLevelTransition(game)
-assertEq(game.score, 750, "level clear bonus")
+assertEq(game.score, 820, "level clear bonus by level")
 assertEq(game.combo.count, 0, "level transition combo reset")
+
+mode:applyLevelRules(game, {ballSpeed = 600, paddleSpeed = 700})
+assertEq(game.ballSpeed, 648, "ball speed scaled by level")
+assertEq(game.paddle.speed, 672, "paddle speed scaled by level")
 
 print("combo_rush_mode_harness: all checks passed")

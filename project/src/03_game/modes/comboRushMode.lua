@@ -1,17 +1,23 @@
 local Combo = require("03_game.combo")
+local ModeBalance = require("03_game.modes.modeBalance")
 
 local ComboRushMode = {}
 ComboRushMode.__index = ComboRushMode
 
-function ComboRushMode.new()
+function ComboRushMode.new(tuning)
     local self = setmetatable({}, ComboRushMode)
-    self.comboConfig = {
+    self.tuning = tuning or ModeBalance.get("combo_rush")
+    self.comboConfig = self.tuning.comboConfig or {
         windowSeconds = 1.1,
         stepMultiplier = 0.35,
         hitsPerStep = 3,
         maxMultiplier = 3.2,
     }
-    self.levelClearBonus = 250
+    self.levelClearBonusByLevel = self.tuning.levelClearBonusByLevel or {
+        [1] = 250,
+    }
+    self.ballSpeedScaleByLevel = self.tuning.ballSpeedScaleByLevel or {}
+    self.paddleSpeedScaleByLevel = self.tuning.paddleSpeedScaleByLevel or {}
     return self
 end
 
@@ -35,7 +41,17 @@ end
 
 function ComboRushMode:onLevelTransition(game)
     Combo.reset(game.combo)
-    game.score = game.score + self.levelClearBonus
+    local bonus = self.levelClearBonusByLevel[game.level] or 0
+    game.score = game.score + bonus
+end
+
+function ComboRushMode:applyLevelRules(game, levelInfo)
+    local level = game.level or 1
+    local ballScale = self.ballSpeedScaleByLevel[level] or 1
+    local paddleScale = self.paddleSpeedScaleByLevel[level] or 1
+
+    game.ballSpeed = math.floor((levelInfo.ballSpeed or game.ballSpeed) * ballScale)
+    game.paddle.speed = math.floor((levelInfo.paddleSpeed or game.paddle.speed) * paddleScale)
 end
 
 function ComboRushMode:awardBrickPoints(game, basePoints)
