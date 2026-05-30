@@ -1,11 +1,13 @@
 local InputAdapter = require("03_game.input.inputAdapter")
 local SceneStack = require("01_core.sceneStack")
 local VirtualResolution = require("01_core.virtualResolution")
+local FixedTimestep = require("01_core.fixedTimestep")
 local TitleScene = require("03_game.scenes.titleScene")
 
 local inputAdapter
 local sceneStack
 local virtual
+local fixedStep
 local BASE_WIDTH = 540
 local BASE_HEIGHT = 1200
 function love.load()
@@ -13,6 +15,7 @@ function love.load()
     virtual = VirtualResolution.new(BASE_WIDTH, BASE_HEIGHT)
     inputAdapter = InputAdapter.new()
     sceneStack = SceneStack.new()
+    fixedStep = FixedTimestep.new()  -- 1/60 고정 타임스텝
     virtual:resize(width, height)
     sceneStack:push(TitleScene.new(BASE_WIDTH, BASE_HEIGHT))
 end
@@ -28,10 +31,14 @@ function love.resize(width, height)
 end
 
 function love.update(dt)
-    if sceneStack then
+    if sceneStack and fixedStep then
         local snapshot = inputAdapter:update()
         sceneStack:setInputSnapshot(snapshot)
-        sceneStack:update(dt)
+        
+        -- 고정 타임스텝으로 게임 로직 업데이트
+        fixedStep:update(dt, function(fixedDt)
+            sceneStack:update(fixedDt)
+        end)
     end
 end
 
@@ -41,6 +48,12 @@ function love.draw()
         virtual:beginDraw()
         sceneStack:draw()
         virtual:endDraw()
+        
+        -- FPS 디버그 표시
+        love.graphics.setColor(1, 1, 0, 1)
+        love.graphics.print("FPS: " .. tostring(love.timer.getFPS()), 10, 10)
+        love.graphics.print("dt: " .. string.format("%.4f", love.timer.getDelta()), 10, 30)
+        love.graphics.setColor(1, 1, 1, 1)
     end
 end
 

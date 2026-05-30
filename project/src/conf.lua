@@ -5,7 +5,7 @@
 -- ◆ 역할
 --   love.conf(t)를 정의하여 윈도우 크기, MSAA, V-sync 등을 설정한다.
 --   resolutionList에서 인덱스로 해상도를 선택한다.
---   현재 기본값: index 6 = 540 × 1200 (세로 모드)
+--   현재 기본값: index 5 = 432 × 960 (세로 모드)
 
 local resolutionList = {
     -- Portrait mode (9:20 ratio) - 세로 모드
@@ -28,7 +28,7 @@ local resolutionList = {
     {width = 2440, height = 1080}, -- note20 for mobile
 }
 
-local resolutionIndex = 6
+local resolutionIndex = 5
 local resolution = resolutionList[resolutionIndex]
 
 function love.conf(t)
@@ -45,7 +45,7 @@ function love.conf(t)
     t.window.minheight = resolution.height / 2      -- Minimum window height
     t.window.resizable = true                        -- Let the window be resizable
     t.window.centered = true                         -- Center the window
-    t.window.vsync = 1                               -- Enable vertical sync
+    t.window.vsync = 0                               -- Enable vertical sync
     t.window.msaa = 8                                -- The number of samples to use with multi-sampled antialiasing
     t.window.fullscreen = false                      -- Enable fullscreen (boolean)
     t.window.fullscreentype = "desktop"              -- Choose between "desktop" fullscreen or "exclusive" fullscreen mode
