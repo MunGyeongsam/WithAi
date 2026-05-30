@@ -5,6 +5,13 @@ local Breakout = {}
 Breakout.__index = Breakout
 
 local TAU = math.pi * 2
+local STATE = {
+    SERVE = "serve",
+    PLAYING = "playing",
+    LEVEL_CLEAR = "level_clear",
+    WON = "won",
+    LOST = "lost",
+}
 
 local function clamp(value, low, high)
     if value < low then
@@ -24,15 +31,21 @@ local function circleRectIntersect(cx, cy, radius, rect)
     return dx * dx + dy * dy <= radius * radius
 end
 
-local function makeBricks(width, layout)
+local function makeBricks(width, height, layout)
     local rows = #layout
     local cols = string.len(layout[1])
-    local sidePadding = 40
-    local topPadding = 70
-    local gap = 8
+    local sidePadding = math.floor(width * 0.08)
+    local topPadding = math.floor(height * 0.11)
+    local gap = math.floor(width * 0.011)
+    if gap < 4 then
+        gap = 4
+    end
 
     local brickW = (width - sidePadding * 2 - (cols - 1) * gap) / cols
-    local brickH = 22
+    local brickH = math.floor(height * 0.022)
+    if brickH < 18 then
+        brickH = 18
+    end
 
     local bricks = {}
 
@@ -107,6 +120,26 @@ local function makeTone(freq, duration, volume)
     return love.audio.newSource(soundData, "static")
 end
 
+local function isValidLayout(layout)
+    if type(layout) ~= "table" or #layout == 0 then
+        return false
+    end
+
+    local colCount = string.len(layout[1] or "")
+    if colCount == 0 then
+        return false
+    end
+
+    for row = 1, #layout do
+        local line = layout[row]
+        if type(line) ~= "string" or string.len(line) ~= colCount then
+            return false
+        end
+    end
+
+    return true
+end
+
 function Breakout.new(width, height)
     local self = setmetatable({}, Breakout)
     self.time = 0
@@ -127,19 +160,23 @@ function Breakout:loadLevel(level)
         return
     end
 
+    if not isValidLayout(levelInfo.layout) then
+        return
+    end
+
     self.level = level
     self.ballSpeed = levelInfo.ballSpeed or 380
     self.paddle.speed = levelInfo.paddleSpeed or 620
     self.theme = levelInfo.theme or self.theme
-    self.bricks = makeBricks(self.width, levelInfo.layout)
-    self.state = "serve"
+    self.bricks = makeBricks(self.width, self.height, levelInfo.layout)
+    self.state = STATE.SERVE
     self.levelClearProgress = 0
     self:resetBallToPaddle()
 end
 
 function Breakout:advanceLevel()
     if self.level < self.maxLevel then
-        self.state = "level_clear"
+        self.state = STATE.LEVEL_CLEAR
         self.levelClearTimer = 1.0
         self.levelClearDuration = 1.0
         self.levelClearProgress = 0
@@ -151,7 +188,7 @@ function Breakout:advanceLevel()
         return
     end
 
-    self.state = "won"
+    self.state = STATE.WON
     self.ball.vx = 0
     self.ball.vy = 0
     self:playSound("win")
@@ -166,7 +203,7 @@ function Breakout:reset(width, height)
     self.lives = 3
     self.level = 1
     self.maxLevel = #Levels
-    self.state = "serve"
+    self.state = STATE.SERVE
     self.levelClearTimer = 0
     self.levelClearDuration = 1
     self.levelClearProgress = 0
@@ -175,7 +212,7 @@ function Breakout:reset(width, height)
         w = 130,
         h = 18,
         x = (self.width - 130) * 0.5,
-        y = self.height - 56,
+        y = self.height - 92,
         speed = 620,
     }
 
@@ -213,6 +250,10 @@ function Breakout:resetBallToPaddle()
     self.ball.y = self.paddle.y - self.ball.r
     self.ball.vx = 0
     self.ball.vy = 0
+end
+
+function Breakout:setState(nextState)
+    self.state = nextState
 end
 
 function Breakout:updatePaddle(dt)
@@ -350,9 +391,9 @@ function Breakout:updateBall(dt)
         self:playSound("miss")
         self:addShake(8, 0.12)
         if self.lives <= 0 then
-            self.state = "lost"
+            self:setState(STATE.LOST)
         else
-            self.state = "serve"
+            self:setState(STATE.SERVE)
             self:resetBallToPaddle()
         end
         return
@@ -375,7 +416,7 @@ function Breakout:updateBall(dt)
     end
 
     if isNaN(ball.x) or isNaN(ball.y) or isNaN(ball.vx) or isNaN(ball.vy) then
-        self.state = "serve"
+        self:setState(STATE.SERVE)
         self:resetBallToPaddle()
         return
     end
@@ -434,7 +475,7 @@ function Breakout:update(dt)
     self:updateEffects(dt)
     self:updatePaddle(dt)
 
-    if self.state == "level_clear" then
+    if self.state == STATE.LEVEL_CLEAR then
         self.levelClearTimer = self.levelClearTimer - dt
         self.levelClearProgress = 1 - (self.levelClearTimer / self.levelClearDuration)
         if self.levelClearProgress < 0 then
@@ -448,12 +489,12 @@ function Breakout:update(dt)
         return
     end
 
-    if self.state == "serve" then
+    if self.state == STATE.SERVE then
         self:resetBallToPaddle()
         return
     end
 
-    if self.state ~= "playing" then
+    if self.state ~= STATE.PLAYING then
         return
     end
 
@@ -538,9 +579,9 @@ function Breakout:draw()
 end
 
 function Breakout:keypressed(key, scancode)
-    if (key == "space" or scancode == "space") and self.state == "serve" then
+    if (key == "space" or scancode == "space") and self.state == STATE.SERVE then
         launchBall(self.ball, self.ballSpeed)
-        self.state = "playing"
+        self:setState(STATE.PLAYING)
         return
     end
 
