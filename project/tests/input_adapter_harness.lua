@@ -11,6 +11,7 @@ end
 local keys = {}
 local touchState = {
     moveAxis = 0,
+    paddleTargetNorm = nil,
     launchPressed = false,
 }
 local adapter = InputAdapter.new({
@@ -21,6 +22,7 @@ local adapter = InputAdapter.new({
         update = function()
             return {
                 moveAxis = touchState.moveAxis,
+                paddleTargetNorm = touchState.paddleTargetNorm,
                 launchPressed = touchState.launchPressed,
                 restartPressed = false,
                 pausePressed = false,
@@ -64,9 +66,16 @@ assertEq(s.moveAxis, 1, "right axis")
 
 keys.right = false
 touchState.moveAxis = -1
+touchState.paddleTargetNorm = 0.2
 touchState.launchPressed = false
 s = adapter:update()
 assertEq(s.moveAxis, -1, "touch axis fallback")
+assertEq(s.paddleTargetNorm, nil, "axis active clears target")
+
+touchState.moveAxis = 0
+s = adapter:update()
+assertEq(s.moveAxis, 0, "touch neutral axis")
+assertEq(s.paddleTargetNorm, 0.2, "touch drag target fallback")
 
 touchState.launchPressed = true
 s = adapter:update()

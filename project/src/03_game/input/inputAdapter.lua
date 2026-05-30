@@ -14,6 +14,7 @@ function InputAdapter.new(options)
     }
     self.snapshot = {
         moveAxis = 0,
+        paddleTargetNorm = nil,
         launchPressed = false,
         restartPressed = false,
         pausePressed = false,
@@ -43,6 +44,11 @@ function InputAdapter:update()
     self.snapshot.moveAxis = keyboardAxis
     if self.snapshot.moveAxis == 0 and touchSnapshot then
         self.snapshot.moveAxis = touchSnapshot.moveAxis or 0
+    end
+
+    self.snapshot.paddleTargetNorm = nil
+    if self.snapshot.moveAxis == 0 and touchSnapshot then
+        self.snapshot.paddleTargetNorm = touchSnapshot.paddleTargetNorm
     end
 
     self.snapshot.launchPressed = launchNow and (not self.prev.launch)

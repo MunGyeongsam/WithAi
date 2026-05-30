@@ -32,6 +32,7 @@ function TouchInput.new(options)
     self.prevDown = false
     self.snapshot = {
         moveAxis = 0,
+        paddleTargetNorm = nil,
         launchPressed = false,
         restartPressed = false,
         pausePressed = false,
@@ -45,6 +46,7 @@ function TouchInput:update()
 
     local isDown = touchId ~= nil
     local moveAxis = 0
+    local paddleTargetNorm = nil
 
     if isDown then
         local xNorm = self.getPosition(touchId)
@@ -57,9 +59,11 @@ function TouchInput:update()
             xNorm = 1
         end
         moveAxis = readMoveAxis(xNorm)
+        paddleTargetNorm = xNorm
     end
 
     self.snapshot.moveAxis = moveAxis
+    self.snapshot.paddleTargetNorm = paddleTargetNorm
     self.snapshot.launchPressed = isDown and (not self.prevDown)
     self.snapshot.restartPressed = false
     self.snapshot.pausePressed = false

@@ -5,9 +5,9 @@ local ResultOverlayScene = require("03_game.scenes.resultOverlayScene")
 local BreakoutScene = {}
 BreakoutScene.__index = BreakoutScene
 
-function BreakoutScene.new(width, height)
+function BreakoutScene.new(width, height, options)
     local self = setmetatable({}, BreakoutScene)
-    self.game = Breakout.new(width, height)
+    self.game = Breakout.new(width, height, options)
     self.resultOverlayShown = false
     return self
 end
@@ -49,6 +49,18 @@ function BreakoutScene:resize(width, height)
 end
 
 function BreakoutScene:keypressed(key, scancode)
+    if key == "1" then
+        self.game:setMode("classic")
+        self.resultOverlayShown = false
+        return
+    end
+
+    if key == "2" then
+        self.game:setMode("combo_rush")
+        self.resultOverlayShown = false
+        return
+    end
+
     if self.game.keypressed then
         self.game:keypressed(key, scancode)
     end

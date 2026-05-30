@@ -15,6 +15,8 @@ function Hud.draw(game)
     gr.print("Score: " .. tostring(game.score), 16, 10)
     gr.print("Level: " .. tostring(game.level) .. "/" .. tostring(game.maxLevel), width * 0.5 - 40, 10)
     gr.print("Lives: " .. tostring(game.lives), width - 90, 10)
+    gr.print("Mode: " .. tostring(game:getModeId()), 16, 30)
+    gr.print("1:Classic  2:ComboRush", width - 180, 30)
 
     local combo = game.combo
     if combo and combo.count > 1 then

@@ -1,6 +1,6 @@
 local Hud = require("04_ui.hud")
 local Levels = require("03_game.levels")
-local ClassicMode = require("03_game.modes.classicMode")
+local ModeRegistry = require("03_game.modes.modeRegistry")
 
 local Breakout = {}
 Breakout.__index = Breakout
@@ -141,10 +141,10 @@ local function isValidLayout(layout)
     return true
 end
 
-function Breakout.new(width, height)
+function Breakout.new(width, height, options)
     local self = setmetatable({}, Breakout)
     self.time = 0
-    self.mode = ClassicMode.new()
+    self.modeId, self.mode = ModeRegistry.create(options and options.modeId)
     self.sounds = {
         brick = makeTone(820, 0.07, 0.35),
         brickHit = makeTone(680, 0.06, 0.28),
@@ -154,6 +154,17 @@ function Breakout.new(width, height)
     }
     self:reset(width, height)
     return self
+end
+
+function Breakout:getModeId()
+    return self.modeId
+end
+
+function Breakout:setMode(modeId)
+    local nextModeId, nextMode = ModeRegistry.create(modeId)
+    self.modeId = nextModeId
+    self.mode = nextMode
+    self:reset(self.width, self.height)
 end
 
 function Breakout:loadLevel(level)
@@ -242,6 +253,7 @@ function Breakout:reset(width, height)
     self.shakeMagnitude = 0
     self.inputSnapshot = {
         moveAxis = 0,
+        paddleTargetNorm = nil,
         launchPressed = false,
         restartPressed = false,
         pausePressed = false,
@@ -275,6 +287,13 @@ end
 
 function Breakout:updatePaddle(dt)
     local direction = self.inputSnapshot.moveAxis or 0
+    local paddleTargetNorm = self.inputSnapshot.paddleTargetNorm
+
+    if paddleTargetNorm ~= nil then
+        local targetX = paddleTargetNorm * self.width - self.paddle.w * 0.5
+        self.paddle.x = clamp(targetX, 0, self.width - self.paddle.w)
+        return
+    end
 
     self.paddle.x = self.paddle.x + direction * self.paddle.speed * dt
     self.paddle.x = clamp(self.paddle.x, 0, self.width - self.paddle.w)

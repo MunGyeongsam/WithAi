@@ -8,6 +8,7 @@ local sceneStack
 local virtual
 local BASE_WIDTH = 540
 local BASE_HEIGHT = 1200
+local DEFAULT_MODE_ID = "classic"
 
 function love.load()
     local width, height = love.graphics.getDimensions()
@@ -15,7 +16,9 @@ function love.load()
     inputAdapter = InputAdapter.new()
     sceneStack = SceneStack.new()
     virtual:resize(width, height)
-    sceneStack:push(BreakoutScene.new(BASE_WIDTH, BASE_HEIGHT))
+    sceneStack:push(BreakoutScene.new(BASE_WIDTH, BASE_HEIGHT, {
+        modeId = DEFAULT_MODE_ID,
+    }))
 end
 
 function love.resize(width, height)
