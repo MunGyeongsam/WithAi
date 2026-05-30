@@ -16,6 +16,13 @@ function Hud.draw(game)
     gr.print("Level: " .. tostring(game.level) .. "/" .. tostring(game.maxLevel), width * 0.5 - 40, 10)
     gr.print("Lives: " .. tostring(game.lives), width - 90, 10)
 
+    local combo = game.combo
+    if combo and combo.count > 1 then
+        setColor(accent[1], accent[2], accent[3])
+        local comboText = "Combo x" .. tostring(combo.count) .. "  Mult x" .. string.format("%.2f", combo.multiplier)
+        gr.printf(comboText, 0, 34, width, "center")
+    end
+
     if game.state == "serve" then
         setColor(ui[1], ui[2], ui[3])
         gr.printf("Press SPACE to launch - Level " .. tostring(game.level), 0, game.height * 0.52, width, "center")

@@ -1,4 +1,5 @@
 local Hud = require("04_ui.hud")
+local Combo = require("03_game.combo")
 local Levels = require("03_game.levels")
 
 local Breakout = {}
@@ -176,6 +177,7 @@ end
 
 function Breakout:advanceLevel()
     if self.level < self.maxLevel then
+        Combo.reset(self.combo)
         self.state = STATE.LEVEL_CLEAR
         self.levelClearTimer = 1.0
         self.levelClearDuration = 1.0
@@ -225,6 +227,7 @@ function Breakout:reset(width, height)
     }
 
     self.ballSpeed = 380
+    self.combo = Combo.new(1.8, 0.25, 4, 2.5)
     self.theme = {
         bgTop = {18, 24, 38},
         bgBottom = {26, 34, 52},
@@ -320,6 +323,7 @@ end
 
 function Breakout:updateEffects(dt)
     self.time = self.time + dt
+    Combo.tick(self.combo, dt)
 
     if self.shakeTime > 0 then
         self.shakeTime = self.shakeTime - dt
@@ -387,6 +391,7 @@ function Breakout:updateBall(dt)
     end
 
     if ball.y - ball.r > self.height then
+        Combo.reset(self.combo)
         self.lives = self.lives - 1
         self:playSound("miss")
         self:addShake(8, 0.12)
@@ -430,15 +435,17 @@ function Breakout:updateBall(dt)
 
             if brick.hp <= 0 then
                 brick.alive = false
-                self.score = self.score + 100
+                local gained = Combo.registerHit(self.combo, 100)
+                self.score = self.score + gained
                 self:playSound("brick")
                 self:spawnBrickParticles(brick.x + brick.w * 0.5, brick.y + brick.h * 0.5, r, g, b)
-                self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+100")
+                self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))
                 self:addShake(4, 0.06)
             else
-                self.score = self.score + 25
+                local gained = Combo.registerHit(self.combo, 25)
+                self.score = self.score + gained
                 self:playSound("brickHit")
-                self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+25")
+                self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))
                 self:addShake(2, 0.04)
             end
 
