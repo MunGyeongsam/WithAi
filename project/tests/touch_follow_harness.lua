@@ -35,4 +35,13 @@ assertEq(x, 200, "respects max bound")
 x = TouchFollow.step(5, -20, 0.5, config, 0, 200)
 assertEq(x, 0, "respects min bound")
 
+x = TouchFollow.step(40, 140, 0, config, 0, 200)
+assertEq(x, 40, "non-positive dt keeps current position")
+
+x = TouchFollow.step(250, 140, -0.1, config, 0, 200)
+assertEq(x, 200, "negative dt clamps current position")
+
+x = TouchFollow.step(80, 80, 0.5, config, 0, 200)
+assertEq(x, 80, "exact target remains stable")
+
 print("touch_follow_harness: all checks passed")

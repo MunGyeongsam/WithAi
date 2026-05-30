@@ -85,4 +85,24 @@ touchState.launchPressed = false
 s = adapter:update()
 assertEq(s.launchPressed, false, "touch launch release")
 
+keys.left = true
+keys.right = true
+touchState.moveAxis = -1
+touchState.paddleTargetNorm = 0.8
+s = adapter:update()
+assertEq(s.moveAxis, 0, "keyboard conflict keeps neutral axis")
+assertEq(s.paddleTargetNorm, nil, "keyboard conflict blocks touch target fallback")
+
+keys.left = false
+keys.right = false
+touchState.moveAxis = -1
+touchState.paddleTargetNorm = 0.8
+s = adapter:update()
+assertEq(s.moveAxis, -1, "touch fallback resumes after keyboard release")
+assertEq(s.paddleTargetNorm, nil, "touch axis active keeps target nil")
+
+touchState.moveAxis = 0
+s = adapter:update()
+assertEq(s.paddleTargetNorm, 0.8, "touch target resumes after axis neutral")
+
 print("input_adapter_harness: all checks passed")

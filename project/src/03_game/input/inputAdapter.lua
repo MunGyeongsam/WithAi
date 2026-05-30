@@ -23,14 +23,17 @@ function InputAdapter.new(options)
 end
 
 local function readMoveAxis(isDown)
+    local leftDown = isDown("left") or isDown("a")
+    local rightDown = isDown("right") or isDown("d")
+
     local axis = 0
-    if isDown("left") or isDown("a") then
+    if leftDown then
         axis = axis - 1
     end
-    if isDown("right") or isDown("d") then
+    if rightDown then
         axis = axis + 1
     end
-    return axis
+    return axis, (leftDown or rightDown)
 end
 
 function InputAdapter:update()
@@ -38,16 +41,16 @@ function InputAdapter:update()
     local restartNow = self.isDown("r")
     local pauseNow = self.isDown("p")
 
-    local keyboardAxis = readMoveAxis(self.isDown)
+    local keyboardAxis, keyboardMoveActive = readMoveAxis(self.isDown)
     local touchSnapshot = self.touchSource:update()
 
     self.snapshot.moveAxis = keyboardAxis
-    if self.snapshot.moveAxis == 0 and touchSnapshot then
+    if (not keyboardMoveActive) and self.snapshot.moveAxis == 0 and touchSnapshot then
         self.snapshot.moveAxis = touchSnapshot.moveAxis or 0
     end
 
     self.snapshot.paddleTargetNorm = nil
-    if self.snapshot.moveAxis == 0 and touchSnapshot then
+    if (not keyboardMoveActive) and self.snapshot.moveAxis == 0 and touchSnapshot then
         self.snapshot.paddleTargetNorm = touchSnapshot.paddleTargetNorm
     end
 
