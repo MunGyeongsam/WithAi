@@ -1,48 +1,38 @@
-local Camera = require("camera")
-local WorldAxis = require("worldAxis")
-local cam
+local Breakout = require("03_game.breakout")
+
+local game
 
 function love.load()
-    -- 화면 높이의 절반을 orthoSize로 설정하여 1유닛 = 1픽셀 매핑을 기본으로 지정합니다.
-    local height = love.graphics.getHeight()
-    cam = Camera.new(0, 0, 5)
+    love.graphics.setBackgroundColor(18 / 255, 24 / 255, 38 / 255)
+    local width, height = love.graphics.getDimensions()
+    game = Breakout.new(width, height)
+end
+
+function love.resize(width, height)
+    if game and game.resize then
+        game:resize(width, height)
+    end
 end
 
 function love.update(dt)
-end
-
-local function drawScreenAxis()
-
-    local gr = love.graphics
-
-    gr.setLineWidth(4)
-
-    -- X 축
-    gr.setColor(1, 0, 0)
-    gr.line(0, 0, 30, 0)
-
-    -- Y 축
-    gr.setColor(0, 1, 0)
-    gr.line(0, 0, 0, 30)
-
-    gr.setLineWidth(1)
+    if game then
+        game:update(dt)
+    end
 end
 
 function love.draw()
-    -- 1. 카메라 좌표계 내에서 월드 축 그리기 (+x, +y)
-    cam:apply()
-    WorldAxis.drawGrid(10, 1, 1)
-    WorldAxis.draw(cam, 3, 4)
-    cam:reset()
-
-    drawScreenAxis()
-
-    -- 2. 스크린 기준 카메라 정보 출력
-    cam:drawInfo(10, 10)
+    if game then
+        game:draw()
+    end
 end
 
-function love.keypressed(key)
+function love.keypressed(key, scancode)
     if key == "escape" then
         love.event.quit()
+        return
+    end
+
+    if game then
+        game:keypressed(key, scancode)
     end
 end

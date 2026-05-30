@@ -34,7 +34,7 @@ local resolution = resolutionList[resolutionIndex]
 function love.conf(t)
     -- Note: logger unavailable at conf time; use print only for critical debug
     
-    t.title = "Vector Swarm - Zero Art Roguelite"    -- The title of the window
+    t.title = "Breakout - Love2D"                     -- The title of the window
     t.author = "Your Name"                           -- The author of the game
     t.version = "11.5"                               -- The LÖVE version this game was made for
     
