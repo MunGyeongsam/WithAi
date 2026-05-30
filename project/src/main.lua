@@ -1,24 +1,20 @@
 local InputAdapter = require("03_game.input.inputAdapter")
 local SceneStack = require("01_core.sceneStack")
 local VirtualResolution = require("01_core.virtualResolution")
-local BreakoutScene = require("03_game.breakoutScene")
+local TitleScene = require("03_game.scenes.titleScene")
 
 local inputAdapter
 local sceneStack
 local virtual
 local BASE_WIDTH = 540
 local BASE_HEIGHT = 1200
-local DEFAULT_MODE_ID = "classic"
-
 function love.load()
     local width, height = love.graphics.getDimensions()
     virtual = VirtualResolution.new(BASE_WIDTH, BASE_HEIGHT)
     inputAdapter = InputAdapter.new()
     sceneStack = SceneStack.new()
     virtual:resize(width, height)
-    sceneStack:push(BreakoutScene.new(BASE_WIDTH, BASE_HEIGHT, {
-        modeId = DEFAULT_MODE_ID,
-    }))
+    sceneStack:push(TitleScene.new(BASE_WIDTH, BASE_HEIGHT))
 end
 
 function love.resize(width, height)
