@@ -141,6 +141,14 @@ local function isValidLayout(layout)
     return true
 end
 
+local function resolveLevelSet(modeId)
+    local levelSet = Levels[modeId]
+    if type(levelSet) ~= "table" or #levelSet == 0 then
+        levelSet = Levels.classic
+    end
+    return levelSet
+end
+
 function Breakout.new(width, height, options)
     local self = setmetatable({}, Breakout)
     self.time = 0
@@ -168,7 +176,7 @@ function Breakout:setMode(modeId)
 end
 
 function Breakout:loadLevel(level)
-    local levelInfo = Levels[level]
+    local levelInfo = self.levelSet[level]
     if not levelInfo then
         return
     end
@@ -219,7 +227,8 @@ function Breakout:reset(width, height)
     self.score = 0
     self.lives = 3
     self.level = 1
-    self.maxLevel = #Levels
+    self.levelSet = resolveLevelSet(self.modeId)
+    self.maxLevel = #self.levelSet
     self.state = STATE.SERVE
     self.levelClearTimer = 0
     self.levelClearDuration = 1
