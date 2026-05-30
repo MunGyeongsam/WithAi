@@ -43,4 +43,9 @@ mode:applyLevelRules(game, {ballSpeed = 600, paddleSpeed = 700})
 assertEq(game.ballSpeed, 648, "ball speed scaled by level")
 assertEq(game.paddle.speed, 672, "paddle speed scaled by level")
 
+game.level = 3
+mode:applyLevelRules(game, {ballSpeed = 600, paddleSpeed = 700})
+assertEq(game.ballSpeed, 696, "level3 ball speed scaled")
+assertEq(game.paddle.speed, 644, "level3 paddle speed scaled")
+
 print("combo_rush_mode_harness: all checks passed")

@@ -40,12 +40,12 @@ ModeBalance.byId = {
         ballSpeedScaleByLevel = {
             [1] = 1.04,
             [2] = 1.08,
-            [3] = 1.12,
+            [3] = 1.16,
         },
         paddleSpeedScaleByLevel = {
             [1] = 0.98,
             [2] = 0.96,
-            [3] = 0.94,
+            [3] = 0.92,
         },
         touchControl = {
             response = 15,
