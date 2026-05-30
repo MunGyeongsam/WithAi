@@ -67,6 +67,37 @@ if not hasSpecialKind(rush2.specialBricks, "risk_core") then
     error("combo_rush level2 should contain risk_core brick")
 end
 
+local lockGroups = {}
+local keyholeGroups = {}
+for _, spec in pairs(rush2.specialBricks) do
+    if spec.kind == "lock" then
+        if type(spec.group) ~= "string" or spec.group == "" then
+            error("lock brick must define non-empty group")
+        end
+        lockGroups[spec.group] = true
+    elseif spec.kind == "keyhole" then
+        if type(spec.unlockGroup) ~= "string" or spec.unlockGroup == "" then
+            error("keyhole brick must define unlockGroup")
+        end
+        keyholeGroups[spec.unlockGroup] = true
+    end
+end
+
+local lockGroupCount = 0
+for _ in pairs(lockGroups) do
+    lockGroupCount = lockGroupCount + 1
+end
+
+if lockGroupCount < 2 then
+    error("combo_rush level2 should have at least two lock groups")
+end
+
+for groupName in pairs(keyholeGroups) do
+    if not lockGroups[groupName] then
+        error("keyhole unlockGroup must match an existing lock group")
+    end
+end
+
 if rush3.ballSpeed <= rush2.ballSpeed then
     error("combo_rush level3 should be faster than level2")
 end

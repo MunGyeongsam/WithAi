@@ -62,6 +62,8 @@ local function makeBricks(width, height, levelInfo)
             local special = specialBricks[key]
             local kind = "normal"
             local locked = false
+            local lockGroup = nil
+            local unlockGroup = nil
 
             if special then
                 kind = special.kind or kind
@@ -70,6 +72,9 @@ local function makeBricks(width, height, levelInfo)
                 end
                 if kind == "lock" then
                     locked = true
+                    lockGroup = special.group or "default"
+                elseif kind == "keyhole" then
+                    unlockGroup = special.unlockGroup
                 end
             end
 
@@ -85,6 +90,8 @@ local function makeBricks(width, height, levelInfo)
                     maxHp = hp,
                     kind = kind,
                     locked = locked,
+                    lockGroup = lockGroup,
+                    unlockGroup = unlockGroup,
                 }
             end
         end
@@ -224,11 +231,12 @@ function Breakout:loadLevel(level)
     self:resetBallToPaddle()
 end
 
-function Breakout:unlockLockedBricks()
+function Breakout:unlockLockedBricks(unlockGroup)
     local unlocked = 0
     for i = 1, #self.bricks do
         local brick = self.bricks[i]
-        if brick.alive and brick.kind == "lock" and brick.locked then
+        local groupMatched = (unlockGroup == nil) or (brick.lockGroup == unlockGroup)
+        if brick.alive and brick.kind == "lock" and brick.locked and groupMatched then
             brick.locked = false
             unlocked = unlocked + 1
         end
@@ -593,7 +601,7 @@ function Breakout:updateBall(dt)
                 self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))
 
                 if brick.kind == "keyhole" then
-                    local unlocked = self:unlockLockedBricks()
+                    local unlocked = self:unlockLockedBricks(brick.unlockGroup)
                     if unlocked > 0 then
                         self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 28, "UNLOCK x" .. tostring(unlocked))
                     end
