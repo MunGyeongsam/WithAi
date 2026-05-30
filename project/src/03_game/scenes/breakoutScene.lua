@@ -88,6 +88,18 @@ end
 
 function BreakoutScene:draw()
     self.game:draw()
+
+    local gr = love.graphics
+    local w = self.game.width
+    local h = self.game.height
+
+    gr.setColor(0.12, 0.16, 0.22, 0.72)
+    gr.rectangle("fill", w * 0.03, h * 0.03, w * 0.16, h * 0.05, 10, 10)
+    gr.rectangle("fill", w * 0.81, h * 0.03, w * 0.16, h * 0.05, 10, 10)
+
+    gr.setColor(0.90, 0.94, 1.0, 0.92)
+    gr.printf("BACK", w * 0.03, h * 0.045, w * 0.16, "center")
+    gr.printf("PAUSE", w * 0.81, h * 0.045, w * 0.16, "center")
 end
 
 function BreakoutScene:resize(width, height)
@@ -116,6 +128,28 @@ function BreakoutScene:keypressed(key, scancode)
 
     if self.game.keypressed then
         self.game:keypressed(key, scancode)
+    end
+end
+
+function BreakoutScene:touchpressed(_, x, y)
+    local w = self.game.width
+    local h = self.game.height
+
+    if x >= w * 0.03 and x <= w * 0.19 and y >= h * 0.03 and y <= h * 0.08 then
+        self:goBack()
+        return
+    end
+
+    if x >= w * 0.81 and x <= w * 0.97 and y >= h * 0.03 and y <= h * 0.08 then
+        if self._stack and self.game.state == "playing" then
+            self._stack:push(PauseOverlayScene.new(self))
+        end
+    end
+end
+
+function BreakoutScene:mousepressed(x, y, button)
+    if button == 1 then
+        self:touchpressed(nil, x, y)
     end
 end
 

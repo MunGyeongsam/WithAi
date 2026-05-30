@@ -61,6 +61,20 @@ function SceneStack:keypressed(key, scancode)
     end
 end
 
+function SceneStack:touchpressed(id, x, y, dx, dy, pressure)
+    local scene = self:top()
+    if scene and scene.touchpressed then
+        scene:touchpressed(id, x, y, dx, dy, pressure)
+    end
+end
+
+function SceneStack:mousepressed(x, y, button, istouch, presses)
+    local scene = self:top()
+    if scene and scene.mousepressed then
+        scene:mousepressed(x, y, button, istouch, presses)
+    end
+end
+
 function SceneStack:setInputSnapshot(snapshot)
     local scene = self:top()
     if scene and scene.setInputSnapshot then

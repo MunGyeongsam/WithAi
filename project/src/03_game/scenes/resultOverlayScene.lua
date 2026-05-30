@@ -55,4 +55,25 @@ function ResultOverlayScene:keypressed(key)
     end
 end
 
+function ResultOverlayScene:touchpressed(_, x, y)
+    local game = self.ownerScene.game
+    if x >= game.width * 0.04 and x <= game.width * 0.32 and y >= game.height * 0.56 and y <= game.height * 0.64 then
+        self.ownerScene:goBack()
+        return
+    end
+
+    if y >= game.height * 0.50 then
+        self.ownerScene.game:reset(game.width, game.height)
+        if self._stack then
+            self._stack:pop()
+        end
+    end
+end
+
+function ResultOverlayScene:mousepressed(x, y, button)
+    if button == 1 then
+        self:touchpressed(nil, x, y)
+    end
+end
+
 return ResultOverlayScene

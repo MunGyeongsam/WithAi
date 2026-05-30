@@ -67,3 +67,17 @@ function love.keypressed(key, scancode)
         sceneStack:keypressed(key, scancode)
     end
 end
+
+function love.touchpressed(id, x, y, dx, dy, pressure)
+    if sceneStack and virtual then
+        local vx, vy = virtual:toVirtual(x, y)
+        sceneStack:touchpressed(id, vx, vy, dx, dy, pressure)
+    end
+end
+
+function love.mousepressed(x, y, button, istouch, presses)
+    if sceneStack and virtual then
+        local vx, vy = virtual:toVirtual(x, y)
+        sceneStack:mousepressed(vx, vy, button, istouch, presses)
+    end
+end

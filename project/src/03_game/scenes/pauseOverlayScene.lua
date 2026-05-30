@@ -31,4 +31,16 @@ function PauseOverlayScene:keypressed(key)
     end
 end
 
+function PauseOverlayScene:touchpressed()
+    if self._stack then
+        self._stack:pop()
+    end
+end
+
+function PauseOverlayScene:mousepressed(_, _, button)
+    if button == 1 then
+        self:touchpressed()
+    end
+end
+
 return PauseOverlayScene

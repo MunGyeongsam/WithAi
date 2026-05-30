@@ -14,6 +14,11 @@ local MODE_LABELS = {
 }
 
 local LOCKED_TEXT = "LOCKED"
+local CARD_TOP_RATIO = 0.20
+
+local function inBackButton(x, y, width, height)
+    return x >= width * 0.04 and x <= width * 0.24 and y >= height * 0.05 and y <= height * 0.11
+end
 
 local function clamp(value, low, high)
     if value < low then
@@ -160,6 +165,37 @@ function LevelSelectScene:isUnlocked(level)
     return level <= (self.progressSnapshot.unlockedLevel or 1)
 end
 
+function LevelSelectScene:cardRect(index)
+    local cardGapX = 18
+    local cardGapY = 20
+    local sidePad = 28
+    local top = math.floor(self.height * CARD_TOP_RATIO)
+    local cardW = math.floor((self.width - sidePad * 2 - cardGapX) / GRID_COLUMNS)
+    local cardH = math.floor((self.height * 0.62 - cardGapY * (VISIBLE_ROWS - 1)) / VISIBLE_ROWS)
+    local visibleStartRow = getVisibleStartRow(self.selected, self.visibleStartRow, #self.levelSet)
+    local row = levelRow(index)
+    local col = levelCol(index)
+    local localRow = row - visibleStartRow
+
+    if localRow < 0 or localRow >= VISIBLE_ROWS then
+        return nil
+    end
+
+    local x = sidePad + (col - 1) * (cardW + cardGapX)
+    local y = top + localRow * (cardH + cardGapY)
+    return x, y, cardW, cardH
+end
+
+function LevelSelectScene:pickCard(x, y)
+    for i = 1, #self.levelSet do
+        local cx, cy, cw, ch = self:cardRect(i)
+        if cx and x >= cx and x <= cx + cw and y >= cy and y <= cy + ch then
+            return i
+        end
+    end
+    return nil
+end
+
 function LevelSelectScene:resize(width, height)
     self.width = width
     self.height = height
@@ -221,6 +257,32 @@ function LevelSelectScene:keypressed(key)
     end
 end
 
+function LevelSelectScene:touchpressed(_, x, y)
+    if inBackButton(x, y, self.width, self.height) then
+        if self._stack then
+            self._stack:replace(self.previousSceneFactory(self.width, self.height, self.modeId))
+        end
+        return
+    end
+
+    local picked = self:pickCard(x, y)
+    if not picked then
+        return
+    end
+
+    if self.selected == picked then
+        self:startSelected(picked)
+    else
+        self:setSelected(picked)
+    end
+end
+
+function LevelSelectScene:mousepressed(x, y, button)
+    if button == 1 then
+        self:touchpressed(nil, x, y)
+    end
+end
+
 function LevelSelectScene:draw()
     local gr = love.graphics
     local total = #self.levelSet
@@ -229,7 +291,7 @@ function LevelSelectScene:draw()
     local cardGapX = 18
     local cardGapY = 20
     local sidePad = 28
-    local top = math.floor(self.height * 0.20)
+    local top = math.floor(self.height * CARD_TOP_RATIO)
     local cardW = math.floor((self.width - sidePad * 2 - cardGapX) / GRID_COLUMNS)
     local cardH = math.floor((self.height * 0.62 - cardGapY * (VISIBLE_ROWS - 1)) / VISIBLE_ROWS)
     local visibleStartRow = getVisibleStartRow(self.selected, self.visibleStartRow, total)
@@ -241,6 +303,10 @@ function LevelSelectScene:draw()
 
     gr.setColor(0.88, 0.93, 0.98, 1)
     gr.printf("SELECT LEVEL", 0, self.height * 0.08, self.width, "center")
+
+    gr.setColor(0.75, 0.82, 0.90, 0.92)
+    gr.rectangle("line", self.width * 0.04, self.height * 0.05, self.width * 0.20, self.height * 0.06, 8, 8)
+    gr.printf("BACK", self.width * 0.04, self.height * 0.068, self.width * 0.20, "center")
 
     gr.setColor(0.65, 0.78, 0.92, 1)
     gr.printf((MODE_LABELS[self.modeId] or self.modeId) .. " ROUTE", 0, self.height * 0.125, self.width, "center")
@@ -328,6 +394,9 @@ function LevelSelectScene:draw()
 
     gr.setColor(0.9, 0.9, 0.9, 1)
     gr.printf("ARROWS/WASD + ENTER  |  NUMBER TO JUMP  |  BACKSPACE BACK", 0, self.height * 0.90, self.width, "center")
+
+    gr.setColor(0.64, 0.74, 0.86, 1)
+    gr.printf("Mobile: tap card to select, tap again to start", 0, self.height * 0.94, self.width, "center")
 end
 
 return LevelSelectScene

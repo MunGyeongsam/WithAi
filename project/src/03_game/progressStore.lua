@@ -160,6 +160,10 @@ function ProgressStore:getModeProgress(modeId, totalLevels)
         modeProgress.unlockedLevel = 1
     end
 
+    if modeProgress.unlockedLevel < 1 then
+        modeProgress.unlockedLevel = 1
+    end
+
     if totalLevels and totalLevels > 0 and modeProgress.unlockedLevel > totalLevels then
         modeProgress.unlockedLevel = totalLevels
     end
