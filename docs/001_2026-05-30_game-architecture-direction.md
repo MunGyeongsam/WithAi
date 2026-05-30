@@ -72,3 +72,14 @@
 - 기본: 일일 1파일 원칙을 사용한다.
 - 같은 날짜의 추가 작업은 새 파일을 만들지 않고 기존 날짜 파일에 누적 기록한다.
 - 새 날짜가 시작되면 다음 번호로 새 worklog 파일을 생성한다.
+
+## 세션 운영 플로우 (총괄 에이전트)
+1. 세션 시작: `game-director`로 Top 3 우선순위 확정
+2. 구현: Top 1부터 순차 진행 (하네스 우선 검증)
+3. 점검: 전체 실행 검증은 필요 시 최소 수행
+4. 기록: 같은 날짜 worklog 파일에 결정/변경/TODO 누적
+
+참조 파일:
+- `.github/agents/game-director.agent.md`
+- `.github/skills/game-direction/SKILL.md`
+- `.github/prompts/game-director-session.prompt.md`
