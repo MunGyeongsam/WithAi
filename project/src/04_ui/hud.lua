@@ -40,7 +40,7 @@ function Hud.draw(game)
 
     if game.state == "serve" then
         setColor(ui[1], ui[2], ui[3])
-        gr.printf("Press SPACE to launch - Level " .. tostring(game.level), 0, game.height * 0.52, width, "center")
+        gr.printf("Aim with mouse, press SPACE/click to launch - Level " .. tostring(game.level), 0, game.height * 0.52, width, "center")
     elseif game.state == "level_clear" then
         local t = game.levelClearProgress or 0
         local scale = 1 + 0.12 * math.sin(t * math.pi)

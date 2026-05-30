@@ -8,6 +8,10 @@ local Breakout = {}
 Breakout.__index = Breakout
 
 local TAU = math.pi * 2
+local SERVE_AIM_MAX_OFFSET = math.rad(62)
+local SERVE_AIM_DEFAULT_NORM = 0.65
+local SERVE_GUIDE_MAX_LENGTH = 420
+local SERVE_GUIDE_MAX_BOUNCES = 4
 local STATE = {
     SERVE = "serve",
     PLAYING = "playing",
@@ -128,10 +132,20 @@ local function brickColor(row, hp, maxHp)
     return 160 * ratio, 145 * ratio, 245 * ratio
 end
 
-local function launchBall(ball, speed)
-    local startVx = math.min(200, speed * 0.48)
-    ball.vx = startVx
-    ball.vy = -speed
+local function launchBall(ball, speed, angle)
+    local launchAngle = angle or -math.pi * 0.5
+    ball.vx = math.cos(launchAngle) * speed
+    ball.vy = math.sin(launchAngle) * speed
+end
+
+local function aimNormToAngle(norm)
+    local n = norm
+    if n == nil then
+        n = SERVE_AIM_DEFAULT_NORM
+    end
+    n = clamp(n, 0, 1)
+    local centered = (n - 0.5) * 2
+    return -math.pi * 0.5 + centered * SERVE_AIM_MAX_OFFSET
 end
 
 local function isNaN(value)
@@ -318,10 +332,13 @@ function Breakout:reset(width, height)
     self.inputSnapshot = {
         moveAxis = 0,
         paddleTargetNorm = nil,
+        serveAimNorm = nil,
         launchPressed = false,
         restartPressed = false,
         pausePressed = false,
     }
+    self.serveAimNorm = SERVE_AIM_DEFAULT_NORM
+    self.serveAimAngle = aimNormToAngle(self.serveAimNorm)
 
     self.mode:onReset(self)
     self.touchControl = (self.mode and self.mode.tuning and self.mode.tuning.touchControl) or {
@@ -687,8 +704,12 @@ function Breakout:update(dt)
     end
 
     if self.state == STATE.SERVE then
+        if self.inputSnapshot.serveAimNorm ~= nil then
+            self.serveAimNorm = clamp(self.inputSnapshot.serveAimNorm, 0, 1)
+            self.serveAimAngle = aimNormToAngle(self.serveAimNorm)
+        end
         if self.inputSnapshot.launchPressed then
-            launchBall(self.ball, self.ballSpeed)
+            launchBall(self.ball, self.ballSpeed, self.serveAimAngle)
             self:setState(STATE.PLAYING)
             return
         end
@@ -789,6 +810,87 @@ function Breakout:drawPaddleAndBall()
 
     gr.setColor(1, 1, 1)
     gr.circle("fill", self.ball.x, self.ball.y, self.ball.r)
+
+    if self.state == STATE.SERVE then
+        local angle = self.serveAimAngle or aimNormToAngle(self.serveAimNorm)
+        local px = self.ball.x
+        local py = self.ball.y
+        local dx = math.cos(angle)
+        local dy = math.sin(angle)
+        local minX = self.ball.r
+        local maxX = self.width - self.ball.r
+        local minY = self.ball.r
+        local remaining = SERVE_GUIDE_MAX_LENGTH
+        local points = {px, py}
+
+        for _ = 1, SERVE_GUIDE_MAX_BOUNCES + 1 do
+            if remaining <= 0 then
+                break
+            end
+
+            local nearestT = nil
+            local hitAxis = nil
+
+            if dx > 0 then
+                local tRight = (maxX - px) / dx
+                if tRight > 0 and (nearestT == nil or tRight < nearestT) then
+                    nearestT = tRight
+                    hitAxis = "x"
+                end
+            elseif dx < 0 then
+                local tLeft = (minX - px) / dx
+                if tLeft > 0 and (nearestT == nil or tLeft < nearestT) then
+                    nearestT = tLeft
+                    hitAxis = "x"
+                end
+            end
+
+            if dy < 0 then
+                local tTop = (minY - py) / dy
+                if tTop > 0 and (nearestT == nil or tTop < nearestT) then
+                    nearestT = tTop
+                    hitAxis = "y"
+                end
+            end
+
+            if nearestT == nil then
+                local nx = px + dx * remaining
+                local ny = py + dy * remaining
+                points[#points + 1] = nx
+                points[#points + 1] = ny
+                break
+            end
+
+            local step = nearestT
+            if step > remaining then
+                step = remaining
+            end
+
+            px = px + dx * step
+            py = py + dy * step
+            points[#points + 1] = px
+            points[#points + 1] = py
+            remaining = remaining - step
+
+            if step < nearestT then
+                break
+            end
+
+            if hitAxis == "x" then
+                dx = -dx
+            elseif hitAxis == "y" then
+                dy = -dy
+            end
+
+            px = px + dx * 0.01
+            py = py + dy * 0.01
+        end
+
+        gr.setColor(1, 1, 1, 0.62)
+        gr.setLineWidth(2)
+        gr.line(points)
+        gr.setLineWidth(1)
+    end
 end
 
 function Breakout:draw()
