@@ -36,6 +36,9 @@ function ResultOverlayScene:draw()
 
     gr.setColor(0.80, 0.86, 1.0, 0.95)
     gr.printf("Press R or ENTER to restart", 0, height * 0.54, width, "center")
+
+    gr.setColor(0.64, 0.70, 0.78, 1)
+    gr.printf("BACKSPACE: Level Select", 0, height * 0.59, width, "center")
 end
 
 function ResultOverlayScene:keypressed(key)
@@ -44,6 +47,11 @@ function ResultOverlayScene:keypressed(key)
         if self._stack then
             self._stack:pop()
         end
+        return
+    end
+
+    if key == "backspace" then
+        self.ownerScene:goBack()
     end
 end
 

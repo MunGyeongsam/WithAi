@@ -1,4 +1,4 @@
-local BreakoutScene = require("03_game.breakoutScene")
+local LevelSelectScene = require("03_game.scenes.levelSelectScene")
 
 local ModeSelectScene = {}
 ModeSelectScene.__index = ModeSelectScene
@@ -13,9 +13,12 @@ function ModeSelectScene.new(width, height, options)
     self.width = width
     self.height = height
     self.options = options or {}
-    self.selected = 1
-    self.startGameFactory = self.options.startGameFactory or function(w, h, modeId)
-        return BreakoutScene.new(w, h, {modeId = modeId})
+    self.selected = self.options.selectedIndex or 1
+    self.nextSceneFactory = self.options.nextSceneFactory or function(w, h, modeId)
+        return LevelSelectScene.new(w, h, {modeId = modeId})
+    end
+    self.previousSceneFactory = self.options.previousSceneFactory or function(w, h)
+        return require("03_game.scenes.titleScene").new(w, h)
     end
     return self
 end
@@ -29,10 +32,17 @@ function ModeSelectScene:startSelected(modeId)
     if not self._stack then
         return
     end
-    self._stack:replace(self.startGameFactory(self.width, self.height, modeId))
+    self._stack:replace(self.nextSceneFactory(self.width, self.height, modeId))
 end
 
 function ModeSelectScene:keypressed(key)
+    if key == "backspace" then
+        if self._stack then
+            self._stack:replace(self.previousSceneFactory(self.width, self.height))
+        end
+        return
+    end
+
     if key == "1" then
         self:startSelected("classic")
         return
@@ -90,6 +100,9 @@ function ModeSelectScene:draw()
 
     gr.setColor(0.9, 0.9, 0.9, 1)
     gr.printf("UP/DOWN + ENTER or press 1/2", 0, self.height * 0.82, self.width, "center")
+
+    gr.setColor(0.64, 0.70, 0.78, 1)
+    gr.printf("BACKSPACE: Back  ESC: Quit", 0, self.height * 0.87, self.width, "center")
 end
 
 return ModeSelectScene

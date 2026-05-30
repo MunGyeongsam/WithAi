@@ -70,6 +70,17 @@ keys.space = false
 s = adapter:update()
 assertEq(s.launchPressed, false, "space release")
 
+keys["return"] = true
+s = adapter:update()
+assertEq(s.launchPressed, true, "return edge press")
+
+s = adapter:update()
+assertEq(s.launchPressed, false, "return hold not repeated")
+
+keys["return"] = false
+s = adapter:update()
+assertEq(s.launchPressed, false, "return release")
+
 keys.r = true
 s = adapter:update()
 assertEq(s.restartPressed, true, "restart edge press")

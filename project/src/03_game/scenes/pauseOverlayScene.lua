@@ -20,11 +20,11 @@ function PauseOverlayScene:draw()
     gr.printf("Paused", 0, height * 0.44, width, "center")
 
     gr.setColor(0.80, 0.86, 1.0, 0.95)
-    gr.printf("Press P or SPACE to resume", 0, height * 0.49, width, "center")
+    gr.printf("Press P, SPACE, or BACKSPACE to resume", 0, height * 0.49, width, "center")
 end
 
 function PauseOverlayScene:keypressed(key)
-    if key == "p" or key == "space" then
+    if key == "p" or key == "space" or key == "backspace" then
         if self._stack then
             self._stack:pop()
         end

@@ -197,8 +197,12 @@ end
 
 function Breakout.new(width, height, options)
     local self = setmetatable({}, Breakout)
+    self.startLevel = 1
     self.time = 0
     self.modeId, self.mode = ModeRegistry.create(options and options.modeId)
+    if options and type(options.startLevel) == "number" then
+        self.startLevel = math.floor(options.startLevel)
+    end
     self.sounds = {
         brick = makeTone(820, 0.07, 0.35),
         brickHit = makeTone(680, 0.06, 0.28),
@@ -219,6 +223,7 @@ function Breakout:setMode(modeId)
     local nextModeId, nextMode = ModeRegistry.create(modeId)
     self.modeId = nextModeId
     self.mode = nextMode
+    self.startLevel = 1
     self:reset(self.width, self.height)
 end
 
@@ -289,9 +294,10 @@ function Breakout:reset(width, height)
 
     self.score = 0
     self.lives = 3
-    self.level = 1
     self.levelSet = resolveLevelSet(self.modeId)
     self.maxLevel = #self.levelSet
+    self.startLevel = clamp(self.startLevel or 1, 1, self.maxLevel)
+    self.level = self.startLevel
     self.state = STATE.SERVE
     self.levelClearTimer = 0
     self.levelClearDuration = 1
@@ -352,7 +358,7 @@ function Breakout:reset(width, height)
         self.riskLane = RiskLane.new(self.height, riskLaneConfig)
     end
 
-    self:loadLevel(1)
+    self:loadLevel(self.startLevel)
 end
 
 function Breakout:resize(width, height)

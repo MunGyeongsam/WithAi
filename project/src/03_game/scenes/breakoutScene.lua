@@ -7,6 +7,7 @@ BreakoutScene.__index = BreakoutScene
 
 function BreakoutScene.new(width, height, options)
     local self = setmetatable({}, BreakoutScene)
+    self.options = options or {}
     self.game = Breakout.new(width, height, options)
     self.resultOverlayShown = false
     return self
@@ -21,6 +22,18 @@ function BreakoutScene:setInputSnapshot(snapshot)
     if snapshot.pausePressed and self._stack and self.game.state == "playing" then
         self._stack:push(PauseOverlayScene.new(self))
     end
+end
+
+function BreakoutScene:goBack()
+    if not self._stack then
+        return
+    end
+
+    local LevelSelectScene = require("03_game.scenes.levelSelectScene")
+    self._stack:replace(LevelSelectScene.new(self.game.width, self.game.height, {
+        modeId = self.game:getModeId(),
+        selectedLevel = self.game.level,
+    }))
 end
 
 function BreakoutScene:update(dt)
@@ -49,6 +62,11 @@ function BreakoutScene:resize(width, height)
 end
 
 function BreakoutScene:keypressed(key, scancode)
+    if key == "backspace" then
+        self:goBack()
+        return
+    end
+
     if key == "1" then
         self.game:setMode("classic")
         self.resultOverlayShown = false
