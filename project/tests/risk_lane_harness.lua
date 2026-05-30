@@ -21,6 +21,16 @@ assertEq(lane:getZoneBottom(), 300, "zone bottom")
 assertEq(lane:isRiskY(280), true, "risk y true")
 assertEq(lane:isRiskY(340), false, "risk y false")
 
+local injected = lane:addTokens(2)
+assertEq(injected, 2, "manual token injection")
+assertEq(lane.tokens, 2, "injected token count")
+
+local injectedCap = lane:addTokens(10)
+assertEq(injectedCap, 2, "manual token injection respects cap")
+assertEq(lane.tokens, 4, "token cap respected")
+
+lane:resetTokens()
+
 local gain = lane:onBrickBreak(250)
 assertEq(gain, 1, "token gain")
 assertEq(lane.tokens, 1, "token count")
@@ -51,6 +61,7 @@ local disabled = RiskLane.new(1000, {
 })
 
 assertEq(disabled:isRiskY(100), false, "disabled lane no risk zone")
+assertEq(disabled:addTokens(2), 0, "disabled lane no token injection")
 local scored2, mult2, consumed2 = disabled:scoreWithBonus(120)
 assertEq(scored2, 120, "disabled lane base score")
 assertEq(mult2, 1, "disabled lane multiplier")

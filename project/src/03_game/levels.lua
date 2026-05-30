@@ -106,6 +106,12 @@ local Levels = {
                 "0111110",
                 "0011100",
             },
+            specialBricks = {
+                ["5,4"] = {kind = "keyhole", hp = 2},
+                ["4,3"] = {kind = "lock", hp = 2},
+                ["4,5"] = {kind = "lock", hp = 2},
+                ["8,4"] = {kind = "risk_core", hp = 2},
+            },
         },
         {
             ballSpeed = 635,

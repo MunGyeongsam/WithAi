@@ -46,14 +46,27 @@ function RiskLane:resetTokens()
     self.tokens = 0
 end
 
+function RiskLane:addTokens(amount)
+    if not self.enabled then
+        return 0
+    end
+
+    local value = amount or 0
+    if value <= 0 then
+        return 0
+    end
+
+    local before = self.tokens
+    self.tokens = clamp(self.tokens + value, 0, self.tokenCap)
+    return self.tokens - before
+end
+
 function RiskLane:onBrickBreak(y)
     if not self:isRiskY(y) then
         return 0
     end
 
-    local before = self.tokens
-    self.tokens = clamp(self.tokens + self.tokenGain, 0, self.tokenCap)
-    return self.tokens - before
+    return self:addTokens(self.tokenGain)
 end
 
 function RiskLane:scoreWithBonus(basePoints)

@@ -34,7 +34,9 @@ local function circleRectIntersect(cx, cy, radius, rect)
     return dx * dx + dy * dy <= radius * radius
 end
 
-local function makeBricks(width, height, layout)
+local function makeBricks(width, height, levelInfo)
+    local layout = levelInfo.layout
+    local specialBricks = levelInfo.specialBricks or {}
     local rows = #layout
     local cols = string.len(layout[1])
     local sidePadding = math.floor(width * 0.08)
@@ -56,6 +58,21 @@ local function makeBricks(width, height, layout)
         local rowMask = layout[row]
         for col = 1, cols do
             local hp = tonumber(string.sub(rowMask, col, col)) or 0
+            local key = tostring(row) .. "," .. tostring(col)
+            local special = specialBricks[key]
+            local kind = "normal"
+            local locked = false
+
+            if special then
+                kind = special.kind or kind
+                if special.hp then
+                    hp = special.hp
+                end
+                if kind == "lock" then
+                    locked = true
+                end
+            end
+
             if hp > 0 then
                 bricks[#bricks + 1] = {
                     x = sidePadding + (col - 1) * (brickW + gap),
@@ -66,12 +83,18 @@ local function makeBricks(width, height, layout)
                     row = row,
                     hp = hp,
                     maxHp = hp,
+                    kind = kind,
+                    locked = locked,
                 }
             end
         end
     end
 
     return bricks
+end
+
+local function isLockedBrick(brick)
+    return brick.kind == "lock" and brick.locked
 end
 
 local function brickColor(row, hp, maxHp)
@@ -195,10 +218,22 @@ function Breakout:loadLevel(level)
         self.mode:applyLevelRules(self, levelInfo)
     end
     self.theme = levelInfo.theme or self.theme
-    self.bricks = makeBricks(self.width, self.height, levelInfo.layout)
+    self.bricks = makeBricks(self.width, self.height, levelInfo)
     self.state = STATE.SERVE
     self.levelClearProgress = 0
     self:resetBallToPaddle()
+end
+
+function Breakout:unlockLockedBricks()
+    local unlocked = 0
+    for i = 1, #self.bricks do
+        local brick = self.bricks[i]
+        if brick.alive and brick.kind == "lock" and brick.locked then
+            brick.locked = false
+            unlocked = unlocked + 1
+        end
+    end
+    return unlocked
 end
 
 function Breakout:advanceLevel()
@@ -519,6 +554,25 @@ function Breakout:updateBall(dt)
     for i = 1, #self.bricks do
         local brick = self.bricks[i]
         if brick.alive and circleRectIntersect(ball.x, ball.y, ball.r, brick) then
+            if isLockedBrick(brick) then
+                self:playSound("brickHit")
+                self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 8, "LOCK")
+                self:addShake(1, 0.03)
+
+                if prevY + ball.r <= brick.y then
+                    ball.vy = -math.abs(ball.vy)
+                elseif prevY - ball.r >= brick.y + brick.h then
+                    ball.vy = math.abs(ball.vy)
+                elseif prevX + ball.r <= brick.x then
+                    ball.vx = -math.abs(ball.vx)
+                elseif prevX - ball.r >= brick.x + brick.w then
+                    ball.vx = math.abs(ball.vx)
+                else
+                    ball.vy = -ball.vy
+                end
+                break
+            end
+
             brick.hp = brick.hp - 1
 
             local r, g, b = brickColor(brick.row, brick.hp, brick.maxHp)
@@ -537,6 +591,19 @@ function Breakout:updateBall(dt)
                 self:playSound("brick")
                 self:spawnBrickParticles(brick.x + brick.w * 0.5, brick.y + brick.h * 0.5, r, g, b)
                 self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))
+
+                if brick.kind == "keyhole" then
+                    local unlocked = self:unlockLockedBricks()
+                    if unlocked > 0 then
+                        self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 28, "UNLOCK x" .. tostring(unlocked))
+                    end
+                elseif brick.kind == "risk_core" and self.riskLane then
+                    local coreGain = self.riskLane:addTokens(1)
+                    if coreGain > 0 then
+                        self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 28, "CORE +" .. tostring(coreGain))
+                    end
+                end
+
                 if self.riskLane then
                     local tokenGain = self.riskLane:onBrickBreak(brick.y)
                     if tokenGain > 0 then
@@ -679,6 +746,19 @@ function Breakout:drawBricks()
         local brick = self.bricks[i]
         if brick.alive then
             local r, g, b = brickColor(brick.row, brick.hp, brick.maxHp)
+
+            if brick.kind == "keyhole" then
+                r, g, b = 255, 214, 102
+            elseif brick.kind == "risk_core" then
+                r, g, b = 255, 135, 96
+            elseif brick.kind == "lock" then
+                if brick.locked then
+                    r, g, b = 115, 128, 152
+                else
+                    r, g, b = 155, 185, 210
+                end
+            end
+
             gr.setColor(r / 255, g / 255, b / 255)
             gr.rectangle("fill", brick.x, brick.y, brick.w, brick.h, 4, 4)
 

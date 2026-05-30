@@ -42,6 +42,31 @@ end
 local rush2 = Levels.combo_rush[2]
 local rush3 = Levels.combo_rush[3]
 
+if type(rush2.specialBricks) ~= "table" then
+    error("combo_rush level2 must define specialBricks")
+end
+
+local function hasSpecialKind(specialBricks, kind)
+    for _, spec in pairs(specialBricks) do
+        if spec.kind == kind then
+            return true
+        end
+    end
+    return false
+end
+
+if not hasSpecialKind(rush2.specialBricks, "keyhole") then
+    error("combo_rush level2 should contain keyhole brick")
+end
+
+if not hasSpecialKind(rush2.specialBricks, "lock") then
+    error("combo_rush level2 should contain lock brick")
+end
+
+if not hasSpecialKind(rush2.specialBricks, "risk_core") then
+    error("combo_rush level2 should contain risk_core brick")
+end
+
 if rush3.ballSpeed <= rush2.ballSpeed then
     error("combo_rush level3 should be faster than level2")
 end
