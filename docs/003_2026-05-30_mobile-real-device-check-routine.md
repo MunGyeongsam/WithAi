@@ -120,3 +120,36 @@
 
 3. worklog에 결과를 남긴다.
 - PASS만 기록하지 말고 FAIL 원인과 후속 액션을 반드시 기록한다.
+
+## 오늘 빌드 기준 1회 실행 카드 (2026-05-30)
+
+아래 순서를 그대로 따라 1기기 실기 체크를 1회 수행한다.
+
+1. 빌드 기준 고정
+- `Build Commit`: `12228199be259d45ef7dd05579ab4c7c9533ea1a`
+- 핵심 변경: Risk 토큰 소모 시 전용 사운드 + 위험구역/HUD 펄스 분리
+
+2. 사전 확인 (데스크톱)
+- 하네스 4종 PASS 상태 확인
+	- `project/tests/risk_lane_harness.lua`
+	- `project/tests/mode_balance_harness.lua`
+	- `project/tests/combo_rush_mode_harness.lua`
+	- `project/tests/levels_set_harness.lua`
+- `run.sh` 1회 스모크 실행 이력 확인
+
+3. 실기 세션 (10~15분)
+- 모드: `combo_rush`
+- 목표: 레벨 3 진입 전후까지 플레이
+- 관찰 포인트:
+	- Risk 토큰 소모 시 사운드가 즉시 들리는가
+	- 위험구역 펄스와 HUD 펄스가 동시에 과포화되지 않는가
+	- 후반 속도 상승 구간에서 입력 품질 저하가 없는가
+
+4. 판정 규칙
+- 아래 중 하나라도 발생하면 FAIL
+	- 토큰 소모 사운드 체감이 약해 이벤트 인지가 어렵다
+	- 펄스가 과도해 공/벽돌 판독을 방해한다
+	- 레벨 3 진입 구간에서 조작 지연 또는 떨림이 반복된다
+
+5. 결과 기록
+- 본 문서의 `기록 템플릿`을 `worklogs/001_2026-05-30_session.md`에 복사해 PASS/FAIL 및 후속 액션을 남긴다.
