@@ -15,11 +15,27 @@ local selectedMode
 local selectedLevel
 local makeModeScene
 local makeLevelScene
+local fakeProgressStore = {
+    getSnapshot = function(_, _, totalLevels)
+        local levels = {}
+        for i = 1, totalLevels do
+            levels[i] = {
+                cleared = false,
+                bestScore = 0,
+            }
+        end
+        return {
+            unlockedLevel = totalLevels,
+            levels = levels,
+        }
+    end,
+}
 
 makeLevelScene = function(modeId)
     selectedMode = modeId
     return LevelSelectScene.new(540, 1200, {
         modeId = modeId,
+        progressStore = fakeProgressStore,
         previousSceneFactory = function()
             return makeModeScene()
         end,

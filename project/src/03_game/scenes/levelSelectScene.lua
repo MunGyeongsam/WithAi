@@ -1,5 +1,6 @@
 local BreakoutScene = require("03_game.scenes.breakoutScene")
 local Levels = require("03_game.levels")
+local ProgressStore = require("03_game.progressStore")
 
 local LevelSelectScene = {}
 LevelSelectScene.__index = LevelSelectScene
@@ -11,6 +12,8 @@ local MODE_LABELS = {
     classic = "Classic",
     combo_rush = "Combo Rush",
 }
+
+local LOCKED_TEXT = "LOCKED"
 
 local function clamp(value, low, high)
     if value < low then
@@ -131,16 +134,30 @@ function LevelSelectScene.new(width, height, options)
     self.levelSet, self.modeId = resolveLevelSet(self.options.modeId)
     self.selected = clamp(self.options.selectedLevel or 1, 1, #self.levelSet)
     self.visibleStartRow = 1
+    self.progressStore = self.options.progressStore or ProgressStore.new()
     self.startGameFactory = self.options.startGameFactory or function(w, h, modeId, startLevel)
-        return BreakoutScene.new(w, h, {modeId = modeId, startLevel = startLevel})
+        return BreakoutScene.new(w, h, {
+            modeId = modeId,
+            startLevel = startLevel,
+            progressStore = self.progressStore,
+        })
     end
     self.previousSceneFactory = self.options.previousSceneFactory or function(w, h, modeId)
         return require("03_game.scenes.modeSelectScene").new(w, h, {
             selectedIndex = modeId == "combo_rush" and 2 or 1,
         })
     end
+    self.progressSnapshot = self.progressStore:getSnapshot(self.modeId, #self.levelSet)
     self.visibleStartRow = getVisibleStartRow(self.selected, self.visibleStartRow, #self.levelSet)
     return self
+end
+
+function LevelSelectScene:refreshProgress()
+    self.progressSnapshot = self.progressStore:getSnapshot(self.modeId, #self.levelSet)
+end
+
+function LevelSelectScene:isUnlocked(level)
+    return level <= (self.progressSnapshot.unlockedLevel or 1)
 end
 
 function LevelSelectScene:resize(width, height)
@@ -150,6 +167,11 @@ end
 
 function LevelSelectScene:startSelected(level)
     if not self._stack then
+        return
+    end
+    self:refreshProgress()
+    if not self:isUnlocked(level) then
+        self:setSelected(level)
         return
     end
     self._stack:replace(self.startGameFactory(self.width, self.height, self.modeId, level))
@@ -202,6 +224,7 @@ end
 function LevelSelectScene:draw()
     local gr = love.graphics
     local total = #self.levelSet
+    local unlockedLevel = self.progressSnapshot.unlockedLevel or 1
     local rowCount = ceilDiv(total, GRID_COLUMNS)
     local cardGapX = 18
     local cardGapY = 20
@@ -222,19 +245,26 @@ function LevelSelectScene:draw()
     gr.setColor(0.65, 0.78, 0.92, 1)
     gr.printf((MODE_LABELS[self.modeId] or self.modeId) .. " ROUTE", 0, self.height * 0.125, self.width, "center")
 
+    gr.setColor(0.78, 0.84, 0.91, 1)
+    gr.printf("Unlocked " .. tostring(unlockedLevel) .. "/" .. tostring(total), 0, self.height * 0.16, self.width, "center")
+
     for row = visibleStartRow, math.min(rowCount, visibleStartRow + VISIBLE_ROWS - 1) do
         for col = 1, GRID_COLUMNS do
             local index = (row - 1) * GRID_COLUMNS + col
             if index <= total then
                 local entry = self.levelSet[index]
+                local progress = self.progressSnapshot.levels[index] or {cleared = false, bestScore = 0}
                 local x = sidePad + (col - 1) * (cardW + cardGapX)
                 local y = top + (row - visibleStartRow) * (cardH + cardGapY)
                 local active = self.selected == index
                 local minimapH = math.floor(cardH * 0.47)
                 local solid = countSolid(entry.layout)
+                local unlocked = self:isUnlocked(index)
 
                 if active then
                     gr.setColor(0.95, 0.9, 0.72, 1)
+                elseif not unlocked then
+                    gr.setColor(0.12, 0.14, 0.18, 1)
                 else
                     gr.setColor(0.16, 0.21, 0.30, 1)
                 end
@@ -249,6 +279,8 @@ function LevelSelectScene:draw()
 
                 if active then
                     gr.setColor(0.12, 0.15, 0.24, 1)
+                elseif not unlocked then
+                    gr.setColor(0.70, 0.73, 0.80, 0.85)
                 else
                     gr.setColor(0.88, 0.93, 0.98, 1)
                 end
@@ -258,11 +290,20 @@ function LevelSelectScene:draw()
 
                 if active then
                     gr.setColor(0.18, 0.20, 0.28, 1)
+                elseif not unlocked then
+                    gr.setColor(0.66, 0.68, 0.74, 1)
                 else
                     gr.setColor(0.68, 0.74, 0.82, 1)
                 end
-                gr.printf(solid .. " bricks", x, y + minimapH + 54, cardW, "center")
-                gr.printf("B " .. tostring(entry.ballSpeed) .. "  P " .. tostring(entry.paddleSpeed), x, y + minimapH + 78, cardW, "center")
+                if not unlocked then
+                    gr.printf(LOCKED_TEXT, x, y + minimapH + 50, cardW, "center")
+                elseif progress.cleared then
+                    gr.printf("CLEAR", x, y + minimapH + 50, cardW, "center")
+                else
+                    gr.printf("OPEN", x, y + minimapH + 50, cardW, "center")
+                end
+                gr.printf("Best " .. tostring(progress.bestScore or 0), x, y + minimapH + 74, cardW, "center")
+                gr.printf(solid .. " bricks  B " .. tostring(entry.ballSpeed), x, y + minimapH + 98, cardW, "center")
             end
         end
     end

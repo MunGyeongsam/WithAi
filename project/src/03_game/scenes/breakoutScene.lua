@@ -1,4 +1,5 @@
 local Breakout = require("03_game.breakout")
+local ProgressStore = require("03_game.progressStore")
 local PauseOverlayScene = require("03_game.scenes.pauseOverlayScene")
 local ResultOverlayScene = require("03_game.scenes.resultOverlayScene")
 
@@ -9,8 +10,38 @@ function BreakoutScene.new(width, height, options)
     local self = setmetatable({}, BreakoutScene)
     self.options = options or {}
     self.game = Breakout.new(width, height, options)
+    self.progressStore = self.options.progressStore or ProgressStore.new()
     self.resultOverlayShown = false
+    self.lastObservedState = self.game.state
     return self
+end
+
+function BreakoutScene:recordProgress(cleared, unlockLevel)
+    self.progressStore:recordLevelResult(
+        self.game:getModeId(),
+        self.game.level,
+        self.game.maxLevel,
+        self.game.score,
+        cleared,
+        unlockLevel
+    )
+end
+
+function BreakoutScene:syncProgress()
+    local state = self.game.state
+    if state == self.lastObservedState then
+        return
+    end
+
+    if state == "level_clear" then
+        self:recordProgress(true, self.game.level + 1)
+    elseif state == "won" then
+        self:recordProgress(true, self.game.maxLevel)
+    elseif state == "lost" then
+        self:recordProgress(false, self.game.level)
+    end
+
+    self.lastObservedState = state
 end
 
 function BreakoutScene:setInputSnapshot(snapshot)
@@ -33,11 +64,13 @@ function BreakoutScene:goBack()
     self._stack:replace(LevelSelectScene.new(self.game.width, self.game.height, {
         modeId = self.game:getModeId(),
         selectedLevel = self.game.level,
+        progressStore = self.progressStore,
     }))
 end
 
 function BreakoutScene:update(dt)
     self.game:update(dt)
+    self:syncProgress()
 
     if not self._stack then
         return
@@ -69,12 +102,14 @@ function BreakoutScene:keypressed(key, scancode)
 
     if key == "1" then
         self.game:setMode("classic")
+        self.lastObservedState = self.game.state
         self.resultOverlayShown = false
         return
     end
 
     if key == "2" then
         self.game:setMode("combo_rush")
+        self.lastObservedState = self.game.state
         self.resultOverlayShown = false
         return
     end
