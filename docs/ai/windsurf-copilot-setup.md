@@ -7,6 +7,11 @@
 - Lua formatter/linter 설정(stylua.toml, .luacheckrc, .editorconfig)
 - Lua/Love2D 실행을 위한 .vscode 워크스페이스 설정
 
+환경 중립 원칙:
+- 학생마다 OS와 런타임 설치 상태가 다를 수 있으므로, 실행 지침은 단일 경로를 가정하지 않는다.
+- 가능하면 VS Code task 또는 저장소에 포함된 실행 진입점을 우선하고, OS별 차이는 보조 विकल्प으로 분리한다.
+- 특정 PATH, 특정 드라이브 경로, 특정 운영체제 전용 명령은 기본값으로 가정하지 않는다.
+
 Copilot 전용:
 - .github/copilot-instructions.md
 - .github/instructions/*.instructions.md
@@ -23,18 +28,20 @@ Windsurf 전용:
 2. 자동화 및 품질 게이트는 scripts/check.sh 에 유지한다.
 3. 위 규칙을 Copilot 과 Windsurf 지침 체계에 동기화한다.
 4. .github AI 파일은 Copilot 연동 계층으로 보고, 원본 규칙 저장소로 사용하지 않는다.
+5. 토큰 효율과 도구 선택 기준은 docs/ai/ai-usage-guide.md 에 둔다.
 
 ## 이 워크스페이스의 Love2D 워크플로우
 
-- 게임 실행: task "Love2D: Run project"
+- 게임 실행: task "Love2D: Run project" 또는 "Run run.sh" / "Run run.bat"
 - 현재 Lua 파일 실행: task "Lua: Run current file"
 - LuaLS globals: love, jit, utf8
 
 ## 사전 요구사항
 
-1. Love2D 를 설치하고 "love" 명령이 PATH 에 잡혀 있어야 한다.
+1. Love2D 를 설치하고, 각 학생 환경에서 사용 가능한 실행 방식(전역 `love`, 저장소 포함 런타임, 또는 VS Code task)을 하나 이상 준비한다.
 2. 에디터에 Lua 언어 지원 확장을 설치한다.
 3. 포맷/린트 일관성을 위해 StyLua + Luacheck 를 사용한다.
+4. 실행 방식이 다르더라도 문서와 task 이름은 가능한 한 공통으로 유지한다.
 
 ## 공식 문서 기반 Windsurf 사용 가이드
 

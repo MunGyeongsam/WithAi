@@ -1,17 +1,17 @@
 # Antigravity + Lua/LÖVE2D 통합 개발 환경 설정 가이드
 
-본 문서는 Google DeepMind 팀이 설계한 강력한 에이전트 AI 코딩 어시스턴트인 **Antigravity**를 사용하여 LÖVE2D 및 Lua 개발 환경을 최적으로 통합하고 고성능 개발 프로세스를 이어나가기 위한 가이드라인입니다.
+본 문서는 Antigravity를 사용하여 LÖVE2D 및 Lua 개발 환경을 통합할 때의 운영 기준을 정리합니다. 학생마다 OS와 런타임 설치 상태가 다를 수 있으므로, 공통 실행 경로와 환경별 대체 경로를 함께 둡니다.
 
 ---
 
 ## 1. Antigravity 협업 모델 및 작동 원리
 
-Antigravity는 단순히 일련의 코드를 완성하는 자동완성 도구가 아닌, 워크스페이스의 전체 흐름과 구조적 책임을 추론하고 대화형으로 코드를 설계 및 리팩터링하는 고지능 에이전트입니다.
+Antigravity는 단순한 자동완성 도구가 아니라, 워크스페이스의 흐름과 책임을 추론하고 대화형으로 코드를 설계 및 리팩터링하는 에이전트입니다.
 
 ### 핵심 동작 계층
 1. **프로젝트 루트 지침 (`AGENTS.md` / `.antigravityrules.md`):**
    - 개발을 시작할 때 Antigravity가 가장 먼저 읽는 최우선순위 명세입니다.
-   - 전역 오염 배제, 모듈 단위 설계, `update/draw` 아키텍처 철저 분리 등의 코딩 표준이 명문화되어 있습니다.
+   - 전역 오염 배제, 모듈 단위 설계, `update/draw` 아키텍처 분리 등의 코딩 표준이 명문화되어 있습니다.
 2. **지능형 하위 규칙 (`.antigravity/rules/`):**
    - 파일 유형 및 작업 목적에 맞추어 활성화되는 정밀 룰셋입니다.
 3. **특화 스킬 및 플로우 (`.antigravity/skills/` & `.antigravity/workflows/`):**
@@ -33,21 +33,27 @@ Antigravity는 단순히 일련의 코드를 완성하는 자동완성 도구가
   ]
   ```
 
+환경 중립 원칙:
+- 학생마다 OS와 런타임 설치 상태가 다를 수 있으므로, 실행 지침은 단일 경로를 가정하지 않는다.
+- 가능하면 VS Code task 또는 저장소에 포함된 실행 진입점을 우선하고, OS별 차이는 보조 경로로 분리한다.
+- 특정 PATH, 특정 드라이브 경로, 특정 운영체제 전용 명령은 기본값으로 가정하지 않는다.
+
 ---
 
-## 3. LÖVE2D 로컬 실행 가이드 (Windows 최적화)
-
-글로벌 환경 변수(`PATH`)에 LÖVE2D가 설정되어 있지 않더라도, 본 프로젝트 내에 패키징된 `love-11.5-win64` 폴더의 런타임을 즉각적으로 호출할 수 있습니다.
+## 3. LÖVE2D 로컬 실행 가이드
 
 ### 실행 옵션 3가지
 1. **쉘 스크립트 실행:**
-   - 프로젝트 루트에 있는 `run.bat` 스크립트를 더블클릭하거나 터미널에서 실행합니다.
-   - `run.bat`은 내부적으로 로컬 `"love-11.5-win64/lovec.exe" "project/src"`를 정확하게 맵핑하여 구동합니다.
+   - Windows 환경에서는 프로젝트 루트에 있는 `run.bat` 스크립트를 더블클릭하거나 터미널에서 실행할 수 있습니다.
+   - macOS 또는 Linux 환경에서는 `run.sh`를 터미널에서 실행할 수 있습니다.
+   - `run.sh`는 `love` 명령을 사용해 `project/src`를 실행하고, 필요하면 `LOVE_BIN`으로 대체 경로를 지정할 수 있습니다.
+   - `run.bat`은 내부적으로 로컬 `"love-11.5-win64/lovec.exe" "project/src"`를 맵핑하여 구동합니다.
 2. **VS Code 작업 자동화 (Tasks):**
-   - `Ctrl + Shift + B` 또는 `Run Task`에서 **`Love2D: Run project`**를 선택하면 로컬 바이너리가 자동으로 실행됩니다.
+   - `Ctrl + Shift + B` 또는 `Run Task`에서 **`Love2D: Run project`**, **`Run run.sh`**, **`Run run.bat`** 중 현재 환경에 맞는 항목을 선택합니다.
    - 개별 스크립트의 빠른 검증이 필요할 경우 **`Lua: Run current file`**을 사용할 수 있습니다.
 3. **F5 디버그 단축키 실행:**
-   - VS Code 내에서 `F5` 키를 누르면, 설정된 `Love2D: Run run.bat (F5)` 구성이 작동하여 자동으로 `run.bat` 스크립트를 즉시 실행하고 게임을 가동합니다.
+   - VS Code 내에서 `F5` 키를 누르면, 설정된 `Love2D: Run run.bat (F5)` 구성이 작동합니다.
+   - 이 구성은 Windows 전용 보조 경로이며, 다른 환경에서는 task 기반 실행을 우선합니다.
 
 ---
 
@@ -72,7 +78,8 @@ WithAi/
 ├── AGENTS.md                   # 에이전트 기본 행동 강령
 ├── project/
 │   └── src/                    # LÖVE2D 소스 코드 루트 (main.lua, config.lua 등)
-└── run.bat                     # 로컬 바이너리 연동 원클릭 실행 스크립트
+├── run.bat                     # Windows 보조 실행 스크립트
+└── run.sh                      # macOS/Linux 보조 실행 스크립트
 ```
 
 ---
