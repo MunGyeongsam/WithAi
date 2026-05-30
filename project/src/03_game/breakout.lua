@@ -1,6 +1,6 @@
 local Hud = require("04_ui.hud")
-local Combo = require("03_game.combo")
 local Levels = require("03_game.levels")
+local ClassicMode = require("03_game.modes.classicMode")
 
 local Breakout = {}
 Breakout.__index = Breakout
@@ -144,6 +144,7 @@ end
 function Breakout.new(width, height)
     local self = setmetatable({}, Breakout)
     self.time = 0
+    self.mode = ClassicMode.new()
     self.sounds = {
         brick = makeTone(820, 0.07, 0.35),
         brickHit = makeTone(680, 0.06, 0.28),
@@ -177,7 +178,7 @@ end
 
 function Breakout:advanceLevel()
     if self.level < self.maxLevel then
-        Combo.reset(self.combo)
+        self.mode:onLevelTransition(self)
         self.state = STATE.LEVEL_CLEAR
         self.levelClearTimer = 1.0
         self.levelClearDuration = 1.0
@@ -227,7 +228,6 @@ function Breakout:reset(width, height)
     }
 
     self.ballSpeed = 380
-    self.combo = Combo.new(1.8, 0.25, 4, 2.5)
     self.theme = {
         bgTop = {18, 24, 38},
         bgBottom = {26, 34, 52},
@@ -246,6 +246,8 @@ function Breakout:reset(width, height)
         restartPressed = false,
         pausePressed = false,
     }
+
+    self.mode:onReset(self)
 
     self:loadLevel(1)
 end
@@ -329,7 +331,7 @@ end
 
 function Breakout:updateEffects(dt)
     self.time = self.time + dt
-    Combo.tick(self.combo, dt)
+    self.mode:update(self, dt)
 
     if self.shakeTime > 0 then
         self.shakeTime = self.shakeTime - dt
@@ -397,7 +399,7 @@ function Breakout:updateBall(dt)
     end
 
     if ball.y - ball.r > self.height then
-        Combo.reset(self.combo)
+        self.mode:onLifeLost(self)
         self.lives = self.lives - 1
         self:playSound("miss")
         self:addShake(8, 0.12)
@@ -441,14 +443,14 @@ function Breakout:updateBall(dt)
 
             if brick.hp <= 0 then
                 brick.alive = false
-                local gained = Combo.registerHit(self.combo, 100)
+                local gained = self.mode:awardBrickPoints(self, 100)
                 self.score = self.score + gained
                 self:playSound("brick")
                 self:spawnBrickParticles(brick.x + brick.w * 0.5, brick.y + brick.h * 0.5, r, g, b)
                 self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))
                 self:addShake(4, 0.06)
             else
-                local gained = Combo.registerHit(self.combo, 25)
+                local gained = self.mode:awardBrickPoints(self, 25)
                 self.score = self.score + gained
                 self:playSound("brickHit")
                 self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))

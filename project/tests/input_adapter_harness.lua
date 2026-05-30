@@ -9,10 +9,24 @@ local function assertEq(actual, expected, message)
 end
 
 local keys = {}
+local touchState = {
+    moveAxis = 0,
+    launchPressed = false,
+}
 local adapter = InputAdapter.new({
     isDown = function(key)
         return keys[key] or false
     end,
+    touchSource = {
+        update = function()
+            return {
+                moveAxis = touchState.moveAxis,
+                launchPressed = touchState.launchPressed,
+                restartPressed = false,
+                pausePressed = false,
+            }
+        end,
+    },
 })
 
 local s = adapter:update()
@@ -47,5 +61,19 @@ keys.left = false
 keys.r = false
 s = adapter:update()
 assertEq(s.moveAxis, 1, "right axis")
+
+keys.right = false
+touchState.moveAxis = -1
+touchState.launchPressed = false
+s = adapter:update()
+assertEq(s.moveAxis, -1, "touch axis fallback")
+
+touchState.launchPressed = true
+s = adapter:update()
+assertEq(s.launchPressed, true, "touch launch press")
+
+touchState.launchPressed = false
+s = adapter:update()
+assertEq(s.launchPressed, false, "touch launch release")
 
 print("input_adapter_harness: all checks passed")

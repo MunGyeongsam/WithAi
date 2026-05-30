@@ -1,9 +1,12 @@
 local InputAdapter = {}
 InputAdapter.__index = InputAdapter
 
+local TouchInput = require("03_game.input.touchInput")
+
 function InputAdapter.new(options)
     local self = setmetatable({}, InputAdapter)
     self.isDown = (options and options.isDown) or love.keyboard.isDown
+    self.touchSource = (options and options.touchSource) or TouchInput.new()
     self.prev = {
         launch = false,
         restart = false,
@@ -34,8 +37,18 @@ function InputAdapter:update()
     local restartNow = self.isDown("r")
     local pauseNow = self.isDown("p")
 
-    self.snapshot.moveAxis = readMoveAxis(self.isDown)
+    local keyboardAxis = readMoveAxis(self.isDown)
+    local touchSnapshot = self.touchSource:update()
+
+    self.snapshot.moveAxis = keyboardAxis
+    if self.snapshot.moveAxis == 0 and touchSnapshot then
+        self.snapshot.moveAxis = touchSnapshot.moveAxis or 0
+    end
+
     self.snapshot.launchPressed = launchNow and (not self.prev.launch)
+    if touchSnapshot and touchSnapshot.launchPressed then
+        self.snapshot.launchPressed = true
+    end
     self.snapshot.restartPressed = restartNow and (not self.prev.restart)
     self.snapshot.pausePressed = pauseNow and (not self.prev.pause)
 

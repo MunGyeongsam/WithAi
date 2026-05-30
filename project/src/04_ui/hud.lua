@@ -37,12 +37,6 @@ function Hud.draw(game)
         setColor(accent[1], accent[2], accent[3], alpha)
         gr.printf("Level Clear! Next Level Incoming...", -width * 0.5, 0, width, "center")
         gr.pop()
-    elseif game.state == "won" then
-        setColor(130, 230, 150)
-        gr.printf("All Levels Clear! Press R to restart", 0, game.height * 0.52, width, "center")
-    elseif game.state == "lost" then
-        setColor(245, 120, 120)
-        gr.printf("Game Over. Press R to restart", 0, game.height * 0.52, width, "center")
     end
 end
 
