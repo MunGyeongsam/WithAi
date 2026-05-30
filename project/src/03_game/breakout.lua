@@ -268,6 +268,8 @@ function Breakout:reset(width, height)
     self.shakeTime = 0
     self.shakeDuration = 0
     self.shakeMagnitude = 0
+    self.riskLaneFlash = 0
+    self.riskLaneLastMult = 1
     self.inputSnapshot = {
         moveAxis = 0,
         paddleTargetNorm = nil,
@@ -386,6 +388,13 @@ function Breakout:updateEffects(dt)
     self.time = self.time + dt
     self.mode:update(self, dt)
 
+    if self.riskLaneFlash > 0 then
+        self.riskLaneFlash = self.riskLaneFlash - dt
+        if self.riskLaneFlash < 0 then
+            self.riskLaneFlash = 0
+        end
+    end
+
     if self.shakeTime > 0 then
         self.shakeTime = self.shakeTime - dt
         if self.shakeTime < 0 then
@@ -501,7 +510,13 @@ function Breakout:updateBall(dt)
                 brick.alive = false
                 local gained = self.mode:awardBrickPoints(self, 100)
                 if self.riskLane then
-                    gained = self.riskLane:scoreWithBonus(gained)
+                    local bonusScore, riskMult, riskConsumed = self.riskLane:scoreWithBonus(gained)
+                    gained = bonusScore
+                    if riskConsumed > 0 then
+                        self.riskLaneLastMult = riskMult
+                        self.riskLaneFlash = 0.35
+                        self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 30, "RISK x" .. string.format("%.2f", riskMult))
+                    end
                 end
                 self.score = self.score + gained
                 self:playSound("brick")
@@ -517,7 +532,13 @@ function Breakout:updateBall(dt)
             else
                 local gained = self.mode:awardBrickPoints(self, 25)
                 if self.riskLane then
-                    gained = self.riskLane:scoreWithBonus(gained)
+                    local bonusScore, riskMult, riskConsumed = self.riskLane:scoreWithBonus(gained)
+                    gained = bonusScore
+                    if riskConsumed > 0 then
+                        self.riskLaneLastMult = riskMult
+                        self.riskLaneFlash = 0.35
+                        self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 26, "RISK x" .. string.format("%.2f", riskMult))
+                    end
                 end
                 self.score = self.score + gained
                 self:playSound("brickHit")
@@ -627,9 +648,13 @@ function Breakout:drawBackground()
     if self.riskLane then
         local zoneBottom = self.riskLane:getZoneBottom()
         local accent = theme.accent or {255, 170, 230}
-        gr.setColor(accent[1] / 255, accent[2] / 255, accent[3] / 255, 0.10)
+        local flashBoost = 0
+        if self.riskLaneFlash > 0 then
+            flashBoost = 0.15 * (self.riskLaneFlash / 0.35)
+        end
+        gr.setColor(accent[1] / 255, accent[2] / 255, accent[3] / 255, 0.10 + flashBoost)
         gr.rectangle("fill", 0, 0, self.width, zoneBottom)
-        gr.setColor(accent[1] / 255, accent[2] / 255, accent[3] / 255, 0.28)
+        gr.setColor(accent[1] / 255, accent[2] / 255, accent[3] / 255, 0.28 + flashBoost)
         gr.rectangle("line", 0, zoneBottom - 2, self.width, 2)
     end
 end

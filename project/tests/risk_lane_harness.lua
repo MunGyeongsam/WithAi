@@ -41,4 +41,19 @@ assertEq(lane.tokens, 4, "token cap")
 lane:resetTokens()
 assertEq(lane.tokens, 0, "reset tokens")
 
+local disabled = RiskLane.new(1000, {
+    enabled = false,
+    zoneHeightRatio = 0.3,
+    tokenCap = 4,
+    tokenGain = 1,
+    consumePerHit = 1,
+    bonusMultiplierPerToken = 0.5,
+})
+
+assertEq(disabled:isRiskY(100), false, "disabled lane no risk zone")
+local scored2, mult2, consumed2 = disabled:scoreWithBonus(120)
+assertEq(scored2, 120, "disabled lane base score")
+assertEq(mult2, 1, "disabled lane multiplier")
+assertEq(consumed2, 0, "disabled lane no consume")
+
 print("risk_lane_harness: all checks passed")
