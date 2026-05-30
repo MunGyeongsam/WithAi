@@ -56,4 +56,58 @@ assertEq(scored2, 120, "disabled lane base score")
 assertEq(mult2, 1, "disabled lane multiplier")
 assertEq(consumed2, 0, "disabled lane no consume")
 
+-- Simulate real game order per brick break:
+-- 1) scoreWithBonus(base)
+-- 2) onBrickBreak(y)
+local function runBreakSequence(targetLane, yList, basePoints)
+    local total = 0
+    local boostedHits = 0
+
+    for i = 1, #yList do
+        local gained, mult, consumed = targetLane:scoreWithBonus(basePoints)
+        total = total + gained
+        if mult > 1 and consumed > 0 then
+            boostedHits = boostedHits + 1
+        end
+        targetLane:onBrickBreak(yList[i])
+    end
+
+    return total, boostedHits
+end
+
+lane:resetTokens()
+local total1, boosted1 = runBreakSequence(lane, {
+    250, 350, 250, 350, 350, 250, 350, 350,
+}, 100)
+
+assertEq(total1, 950, "mixed sequence score profile")
+assertEq(boosted1, 3, "mixed sequence boosted hit count")
+assertEq(lane.tokens, 0, "mixed sequence remaining tokens")
+
+lane:resetTokens()
+local total2, boosted2 = runBreakSequence(lane, {
+    250, 250, 250, 250, 250, 250,
+}, 100)
+
+assertEq(total2, 850, "dense risk sequence score profile")
+assertEq(boosted2, 5, "dense risk sequence boosted hit count")
+assertEq(lane.tokens, 1, "dense risk sequence token carry")
+
+local tuned = RiskLane.new(1000, {
+    enabled = true,
+    zoneHeightRatio = 0.3,
+    tokenCap = 4,
+    tokenGain = 2,
+    consumePerHit = 2,
+    bonusMultiplierPerToken = 0.5,
+})
+
+local tunedScoreA = tuned:scoreWithBonus(99)
+assertEq(tunedScoreA, 99, "tuned first hit no bonus")
+tuned:onBrickBreak(250)
+local tunedScoreB, tunedMultB, tunedConsumedB = tuned:scoreWithBonus(99)
+assertEq(tunedScoreB, 198, "tuned second hit doubled by two-token consume")
+assertEq(tunedMultB, 2.0, "tuned multiplier")
+assertEq(tunedConsumedB, 2, "tuned consumed tokens")
+
 print("risk_lane_harness: all checks passed")
