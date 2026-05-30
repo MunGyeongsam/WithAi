@@ -1,6 +1,7 @@
 local Hud = require("04_ui.hud")
 local Levels = require("03_game.levels")
 local ModeRegistry = require("03_game.modes.modeRegistry")
+local RiskLane = require("03_game.riskLane")
 local TouchFollow = require("03_game.input.touchFollow")
 
 local Breakout = {}
@@ -202,6 +203,9 @@ end
 function Breakout:advanceLevel()
     if self.level < self.maxLevel then
         self.mode:onLevelTransition(self)
+        if self.riskLane then
+            self.riskLane:resetTokens()
+        end
         self.state = STATE.LEVEL_CLEAR
         self.levelClearTimer = 1.0
         self.levelClearDuration = 1.0
@@ -278,6 +282,11 @@ function Breakout:reset(width, height)
         maxSpeed = 900,
         snapDistance = 6,
     }
+    local riskLaneConfig = self.mode and self.mode.tuning and self.mode.tuning.riskLane
+    self.riskLane = nil
+    if riskLaneConfig and riskLaneConfig.enabled then
+        self.riskLane = RiskLane.new(self.height, riskLaneConfig)
+    end
 
     self:loadLevel(1)
 end
@@ -444,6 +453,9 @@ function Breakout:updateBall(dt)
 
     if ball.y - ball.r > self.height then
         self.mode:onLifeLost(self)
+        if self.riskLane then
+            self.riskLane:resetTokens()
+        end
         self.lives = self.lives - 1
         self:playSound("miss")
         self:addShake(8, 0.12)
@@ -488,13 +500,25 @@ function Breakout:updateBall(dt)
             if brick.hp <= 0 then
                 brick.alive = false
                 local gained = self.mode:awardBrickPoints(self, 100)
+                if self.riskLane then
+                    gained = self.riskLane:scoreWithBonus(gained)
+                end
                 self.score = self.score + gained
                 self:playSound("brick")
                 self:spawnBrickParticles(brick.x + brick.w * 0.5, brick.y + brick.h * 0.5, r, g, b)
                 self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))
+                if self.riskLane then
+                    local tokenGain = self.riskLane:onBrickBreak(brick.y)
+                    if tokenGain > 0 then
+                        self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 16, "RISK +" .. tostring(tokenGain))
+                    end
+                end
                 self:addShake(4, 0.06)
             else
                 local gained = self.mode:awardBrickPoints(self, 25)
+                if self.riskLane then
+                    gained = self.riskLane:scoreWithBonus(gained)
+                end
                 self.score = self.score + gained
                 self:playSound("brickHit")
                 self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y, "+" .. tostring(gained))
@@ -599,6 +623,15 @@ function Breakout:drawBackground()
 
     gr.setColor(bgBottom[1] / 255, bgBottom[2] / 255, bgBottom[3] / 255, 0.75)
     gr.rectangle("fill", 0, self.height * 0.62, self.width, self.height * 0.38)
+
+    if self.riskLane then
+        local zoneBottom = self.riskLane:getZoneBottom()
+        local accent = theme.accent or {255, 170, 230}
+        gr.setColor(accent[1] / 255, accent[2] / 255, accent[3] / 255, 0.10)
+        gr.rectangle("fill", 0, 0, self.width, zoneBottom)
+        gr.setColor(accent[1] / 255, accent[2] / 255, accent[3] / 255, 0.28)
+        gr.rectangle("line", 0, zoneBottom - 2, self.width, 2)
+    end
 end
 
 function Breakout:drawBricks()

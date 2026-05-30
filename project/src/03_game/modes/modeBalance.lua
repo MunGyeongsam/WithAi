@@ -16,6 +16,14 @@ ModeBalance.byId = {
             maxSpeed = 880,
             snapDistance = 8,
         },
+        riskLane = {
+            enabled = false,
+            zoneHeightRatio = 0.28,
+            tokenCap = 0,
+            tokenGain = 0,
+            consumePerHit = 0,
+            bonusMultiplierPerToken = 0,
+        },
     },
     combo_rush = {
         comboConfig = {
@@ -43,6 +51,14 @@ ModeBalance.byId = {
             response = 15,
             maxSpeed = 1120,
             snapDistance = 6,
+        },
+        riskLane = {
+            enabled = true,
+            zoneHeightRatio = 0.30,
+            tokenCap = 4,
+            tokenGain = 1,
+            consumePerHit = 1,
+            bonusMultiplierPerToken = 0.5,
         },
     },
 }

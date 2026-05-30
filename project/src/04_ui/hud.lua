@@ -18,6 +18,11 @@ function Hud.draw(game)
     gr.print("Mode: " .. tostring(game:getModeId()), 16, 30)
     gr.print("1:Classic  2:ComboRush", width - 180, 30)
 
+    if game.riskLane then
+        setColor(accent[1], accent[2], accent[3])
+        gr.print("Risk Tokens: " .. tostring(game.riskLane.tokens), 16, 50)
+    end
+
     local combo = game.combo
     if combo and combo.count > 1 then
         setColor(accent[1], accent[2], accent[3])
