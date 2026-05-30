@@ -19,10 +19,10 @@ function Hud.draw(game)
     gr.print("1:Classic  2:ComboRush", width - 180, 30)
 
     if game.riskLane then
-        local flash = game.riskLaneFlash or 0
+        local flash = game.riskLaneHudFlash or 0
         local flashAlpha = 0.75
         if flash > 0 then
-            flashAlpha = 0.75 + 0.25 * (flash / 0.35)
+            flashAlpha = 0.72 + 0.28 * (flash / 0.46)
         end
         setColor(accent[1], accent[2], accent[3], flashAlpha)
         gr.print("Risk Tokens: " .. tostring(game.riskLane.tokens), 16, 50)
