@@ -10,10 +10,12 @@ end
 
 local classic = ModeBalance.get("classic")
 assertEq(classic.comboConfig.windowSeconds, 1.8, "classic combo window")
+assertEq(classic.touchControl.response, 11, "classic touch response")
 
 local rush = ModeBalance.get("combo_rush")
 assertEq(rush.levelClearBonusByLevel[1], 220, "rush level1 bonus")
 assertEq(rush.ballSpeedScaleByLevel[3], 1.12, "rush level3 ball scale")
+assertEq(rush.touchControl.maxSpeed, 1120, "rush touch max speed")
 
 local fallback = ModeBalance.get("unknown")
 assertEq(fallback.comboConfig.hitsPerStep, 4, "fallback to classic")

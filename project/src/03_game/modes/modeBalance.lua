@@ -11,6 +11,11 @@ ModeBalance.byId = {
         levelClearBonusByLevel = {},
         ballSpeedScaleByLevel = {},
         paddleSpeedScaleByLevel = {},
+        touchControl = {
+            response = 11,
+            maxSpeed = 880,
+            snapDistance = 8,
+        },
     },
     combo_rush = {
         comboConfig = {
@@ -33,6 +38,11 @@ ModeBalance.byId = {
             [1] = 0.98,
             [2] = 0.96,
             [3] = 0.94,
+        },
+        touchControl = {
+            response = 15,
+            maxSpeed = 1120,
+            snapDistance = 6,
         },
     },
 }

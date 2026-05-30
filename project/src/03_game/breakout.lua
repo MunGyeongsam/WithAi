@@ -1,6 +1,7 @@
 local Hud = require("04_ui.hud")
 local Levels = require("03_game.levels")
 local ModeRegistry = require("03_game.modes.modeRegistry")
+local TouchFollow = require("03_game.input.touchFollow")
 
 local Breakout = {}
 Breakout.__index = Breakout
@@ -272,6 +273,11 @@ function Breakout:reset(width, height)
     }
 
     self.mode:onReset(self)
+    self.touchControl = (self.mode and self.mode.tuning and self.mode.tuning.touchControl) or {
+        response = 12,
+        maxSpeed = 900,
+        snapDistance = 6,
+    }
 
     self:loadLevel(1)
 end
@@ -303,7 +309,14 @@ function Breakout:updatePaddle(dt)
 
     if paddleTargetNorm ~= nil then
         local targetX = paddleTargetNorm * self.width - self.paddle.w * 0.5
-        self.paddle.x = clamp(targetX, 0, self.width - self.paddle.w)
+        self.paddle.x = TouchFollow.step(
+            self.paddle.x,
+            targetX,
+            dt,
+            self.touchControl,
+            0,
+            self.width - self.paddle.w
+        )
         return
     end
 
