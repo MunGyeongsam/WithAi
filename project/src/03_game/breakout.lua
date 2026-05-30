@@ -240,6 +240,12 @@ function Breakout:reset(width, height)
     self.shakeTime = 0
     self.shakeDuration = 0
     self.shakeMagnitude = 0
+    self.inputSnapshot = {
+        moveAxis = 0,
+        launchPressed = false,
+        restartPressed = false,
+        pausePressed = false,
+    }
 
     self:loadLevel(1)
 end
@@ -259,14 +265,14 @@ function Breakout:setState(nextState)
     self.state = nextState
 end
 
+function Breakout:setInputSnapshot(snapshot)
+    if snapshot then
+        self.inputSnapshot = snapshot
+    end
+end
+
 function Breakout:updatePaddle(dt)
-    local direction = 0
-    if love.keyboard.isDown("left") or love.keyboard.isDown("a") then
-        direction = direction - 1
-    end
-    if love.keyboard.isDown("right") or love.keyboard.isDown("d") then
-        direction = direction + 1
-    end
+    local direction = self.inputSnapshot.moveAxis or 0
 
     self.paddle.x = self.paddle.x + direction * self.paddle.speed * dt
     self.paddle.x = clamp(self.paddle.x, 0, self.width - self.paddle.w)
@@ -482,6 +488,11 @@ function Breakout:update(dt)
     self:updateEffects(dt)
     self:updatePaddle(dt)
 
+    if self.inputSnapshot.restartPressed then
+        self:reset(self.width, self.height)
+        return
+    end
+
     if self.state == STATE.LEVEL_CLEAR then
         self.levelClearTimer = self.levelClearTimer - dt
         self.levelClearProgress = 1 - (self.levelClearTimer / self.levelClearDuration)
@@ -497,6 +508,11 @@ function Breakout:update(dt)
     end
 
     if self.state == STATE.SERVE then
+        if self.inputSnapshot.launchPressed then
+            launchBall(self.ball, self.ballSpeed)
+            self:setState(STATE.PLAYING)
+            return
+        end
         self:resetBallToPaddle()
         return
     end
@@ -583,18 +599,6 @@ function Breakout:draw()
     gr.pop()
 
     Hud.draw(self)
-end
-
-function Breakout:keypressed(key, scancode)
-    if (key == "space" or scancode == "space") and self.state == STATE.SERVE then
-        launchBall(self.ball, self.ballSpeed)
-        self:setState(STATE.PLAYING)
-        return
-    end
-
-    if key == "r" or key == "R" or scancode == "r" then
-        self:reset(self.width, self.height)
-    end
 end
 
 return Breakout
