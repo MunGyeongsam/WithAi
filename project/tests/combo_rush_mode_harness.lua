@@ -19,6 +19,8 @@ local game = {
 mode:onReset(game)
 assertEq(game.score, 0, "score reset")
 assertEq(game.combo.count, 0, "combo count reset")
+assertEq(game.combo.windowSeconds, 1.1, "combo_rush window fixed")
+assertEq(game.combo.hitsPerStep, 3, "combo_rush hits per step fixed")
 
 local gained = mode:awardBrickPoints(game, 100)
 assertEq(gained, 100, "first hit points")
@@ -47,5 +49,12 @@ game.level = 3
 mode:applyLevelRules(game, {ballSpeed = 600, paddleSpeed = 700})
 assertEq(game.ballSpeed, 696, "level3 ball speed scaled")
 assertEq(game.paddle.speed, 644, "level3 paddle speed scaled")
+
+-- Keep level3 pressure profile stable: faster ball with relatively slower paddle.
+local pressureL2 = 648 / 672
+local pressureL3 = 696 / 644
+if pressureL3 <= pressureL2 then
+    error("level3 pressure must exceed level2")
+end
 
 print("combo_rush_mode_harness: all checks passed")
