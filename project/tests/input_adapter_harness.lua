@@ -18,6 +18,8 @@ local mouseState = {
 local touchState = {
     moveAxis = 0,
     paddleTargetNorm = nil,
+    paddleDeltaNorm = 0,
+    serveAimNorm = nil,
     launchPressed = false,
 }
 local adapter = InputAdapter.new({
@@ -41,6 +43,8 @@ local adapter = InputAdapter.new({
             return {
                 moveAxis = touchState.moveAxis,
                 paddleTargetNorm = touchState.paddleTargetNorm,
+                paddleDeltaNorm = touchState.paddleDeltaNorm,
+                serveAimNorm = touchState.serveAimNorm,
                 launchPressed = touchState.launchPressed,
                 restartPressed = false,
                 pausePressed = false,
@@ -100,6 +104,7 @@ mouseState.paddleTargetNorm = 0.3
 mouseState.serveAimNorm = 0.3
 touchState.moveAxis = -1
 touchState.paddleTargetNorm = 0.2
+touchState.paddleDeltaNorm = 0
 touchState.launchPressed = false
 s = adapter:update()
 assertEq(s.moveAxis, -1, "pointer axis fallback")
@@ -112,9 +117,28 @@ s = adapter:update()
 assertEq(s.moveAxis, 0, "touch neutral axis")
 assertEq(s.paddleTargetNorm, 0.2, "touch drag target fallback")
 
-mouseState.paddleTargetNorm = nil
+touchState.paddleTargetNorm = nil
+touchState.paddleDeltaNorm = 0.12
 s = adapter:update()
-assertEq(s.paddleTargetNorm, 0.2, "touch target remains active")
+assertEq(s.paddleDeltaNorm, 0.12, "touch delta forwarded")
+
+touchState.serveAimNorm = 0.42
+mouseState.serveAimNorm = 0.88
+s = adapter:update()
+assertEq(s.serveAimNorm, 0.42, "touch serve aim priority")
+touchState.serveAimNorm = nil
+mouseState.serveAimNorm = 0.3
+
+mouseState.paddleTargetNorm = nil
+touchState.paddleDeltaNorm = 0
+s = adapter:update()
+assertEq(s.paddleTargetNorm, nil, "no pointer target when touch and mouse targets are nil")
+
+mouseState.paddleTargetNorm = 0.67
+touchState.paddleTargetNorm = nil
+s = adapter:update()
+assertEq(s.paddleTargetNorm, 0.67, "mouse target fallback when touch target is nil")
+mouseState.paddleTargetNorm = nil
 
 mouseState.launchPressed = true
 s = adapter:update()

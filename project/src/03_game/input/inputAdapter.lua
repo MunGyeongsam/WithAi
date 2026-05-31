@@ -17,6 +17,7 @@ function InputAdapter.new(options)
     self.snapshot = {
         moveAxis = 0,
         paddleTargetNorm = nil,
+        paddleDeltaNorm = 0,
         serveAimNorm = nil,
         launchPressed = false,
         restartPressed = false,
@@ -54,13 +55,34 @@ function InputAdapter:update()
     end
 
     self.snapshot.paddleTargetNorm = nil
-    if (not keyboardMoveActive) and self.snapshot.moveAxis == 0 and touchSnapshot then
-        self.snapshot.paddleTargetNorm = touchSnapshot.paddleTargetNorm
+    self.snapshot.paddleDeltaNorm = 0
+    if (not keyboardMoveActive) and self.snapshot.moveAxis == 0 then
+        local touchDelta = touchSnapshot and (touchSnapshot.paddleDeltaNorm or 0) or 0
+        local mouseDelta = mouseSnapshot and (mouseSnapshot.paddleDeltaNorm or 0) or 0
+
+        local touchTarget = touchSnapshot and touchSnapshot.paddleTargetNorm or nil
+        local mouseTarget = mouseSnapshot and mouseSnapshot.paddleTargetNorm or nil
+
+        if touchTarget ~= nil then
+            self.snapshot.paddleTargetNorm = touchTarget
+        elseif mouseTarget ~= nil then
+            self.snapshot.paddleTargetNorm = mouseTarget
+        end
+
+        if touchDelta ~= 0 then
+            self.snapshot.paddleDeltaNorm = touchDelta
+        elseif mouseDelta ~= 0 then
+            self.snapshot.paddleDeltaNorm = mouseDelta
+        end
     end
 
     self.snapshot.serveAimNorm = nil
-    if mouseSnapshot then
-        self.snapshot.serveAimNorm = mouseSnapshot.serveAimNorm
+    local touchServeAim = touchSnapshot and touchSnapshot.serveAimNorm or nil
+    local mouseServeAim = mouseSnapshot and mouseSnapshot.serveAimNorm or nil
+    if touchServeAim ~= nil then
+        self.snapshot.serveAimNorm = touchServeAim
+    elseif mouseServeAim ~= nil then
+        self.snapshot.serveAimNorm = mouseServeAim
     end
 
     self.snapshot.launchPressed = launchNow and (not self.prev.launch)
