@@ -32,6 +32,16 @@ function TitleScene:keypressed(key)
     end
 end
 
+function TitleScene:touchpressed()
+    self:startNext()
+end
+
+function TitleScene:mousepressed(_, _, button)
+    if button == 1 then
+        self:startNext()
+    end
+end
+
 function TitleScene:draw()
     local gr = love.graphics
     gr.setColor(0.08, 0.1, 0.16, 1)
@@ -45,6 +55,9 @@ function TitleScene:draw()
 
     gr.setColor(0.95, 0.9, 0.72, 1)
     gr.printf("Press SPACE or ENTER", 0, self.height * 0.62, self.width, "center")
+
+    gr.setColor(0.72, 0.78, 0.88, 1)
+    gr.printf("Mobile: tap anywhere to continue", 0, self.height * 0.67, self.width, "center")
 end
 
 return TitleScene

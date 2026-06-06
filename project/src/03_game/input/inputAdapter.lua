@@ -40,7 +40,7 @@ local function readMoveAxis(isDown)
 end
 
 function InputAdapter:update()
-    local launchNow = self.isDown("space")
+    local launchNow = self.isDown("space") or self.isDown("return") or self.isDown("kpenter")
     local restartNow = self.isDown("r")
     local pauseNow = self.isDown("p")
 
