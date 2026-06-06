@@ -1,4 +1,4 @@
-package.path = package.path .. ";project/src/?.lua;project/src/?/init.lua;project/src/?/?.lua"
+package.path = package.path .. ";01_breakout/src/?.lua;01_breakout/src/?/init.lua;01_breakout/src/?/?.lua"
 
 local Levels = require("03_game.levels")
 
@@ -16,8 +16,8 @@ if type(Levels.combo_rush) ~= "table" or #Levels.combo_rush == 0 then
     error("combo_rush level set must exist")
 end
 
-assertEq(#Levels.classic, 5, "classic level count")
-assertEq(#Levels.combo_rush, 5, "combo_rush level count")
+assertEq(#Levels.classic, 6, "classic level count")
+assertEq(#Levels.combo_rush, 6, "combo_rush level count")
 
 local classicFirst = Levels.classic[1]
 local rushFirst = Levels.combo_rush[1]

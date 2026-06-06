@@ -1,4 +1,5 @@
 local ModeSelectScene = require("03_game.scenes.modeSelectScene")
+local BreakoutScene = require("03_game.scenes.breakoutScene")
 
 local TitleScene = {}
 TitleScene.__index = TitleScene
@@ -26,9 +27,27 @@ function TitleScene:startNext()
     self._stack:replace(self.nextSceneFactory(self.width, self.height))
 end
 
+function TitleScene:startComboRushLevel(level)
+    if not self._stack then
+        return
+    end
+
+    self._stack:replace(BreakoutScene.new(self.width, self.height, {
+        modeId = "combo_rush",
+        startLevel = level,
+        findServePreset = true,
+        autoLaunchOnServe = true,
+    }))
+end
+
 function TitleScene:keypressed(key)
     if key == "return" or key == "space" then
         self:startNext()
+        return
+    end
+
+    if key == "f6" then
+        self:startComboRushLevel(6)
     end
 end
 
@@ -58,6 +77,9 @@ function TitleScene:draw()
 
     gr.setColor(0.72, 0.78, 0.88, 1)
     gr.printf("Mobile: tap anywhere to continue", 0, self.height * 0.67, self.width, "center")
+
+    gr.setColor(0.58, 0.66, 0.78, 1)
+    gr.printf("Dev shortcut: F6 -> Combo Rush Lv.6 (auto route)", 0, self.height * 0.74, self.width, "center")
 end
 
 return TitleScene

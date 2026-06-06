@@ -3,7 +3,7 @@
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-GAME_DIR="$SCRIPT_DIR/project/src"
+GAME_DIR="$SCRIPT_DIR/01_breakout/src"
 LOCAL_MAC_LOVE="$SCRIPT_DIR/love-11.5-mac/love.app/Contents/MacOS/love"
 LOVE_BIN="${LOVE_BIN:-$LOCAL_MAC_LOVE}"
 

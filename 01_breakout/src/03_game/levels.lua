@@ -105,6 +105,27 @@ local Levels = {
                 "0011100",
             },
         },
+        {
+            ballSpeed = 470,
+            paddleSpeed = 820,
+            theme = {
+                bgTop = {14, 22, 34},
+                bgBottom = {20, 34, 56},
+                ui = {230, 240, 250},
+                accent = {255, 224, 136},
+            },
+            layout = {
+                "1111111",
+                "1111111",
+                "1000000",
+                "1111111",
+                "0000001",
+                "1111111",
+                "1000000",
+                "1111111",
+                "0000001",
+            },
+        },
     },
     combo_rush = {
         {
@@ -131,6 +152,7 @@ local Levels = {
         {
             ballSpeed = 565,
             paddleSpeed = 720,
+            disableLockState = true,
             theme = {
                 bgTop = {16, 26, 30},
                 bgBottom = {20, 40, 52},
@@ -181,6 +203,7 @@ local Levels = {
         {
             ballSpeed = 700,
             paddleSpeed = 770,
+            disableLockState = true,
             theme = {
                 bgTop = {16, 20, 40},
                 bgBottom = {24, 30, 68},
@@ -227,6 +250,27 @@ local Levels = {
             },
             specialBricks = {
                 ["4,4"] = {kind = "risk_core", hp = 3},
+            },
+        },
+        {
+            ballSpeed = 540,
+            paddleSpeed = 820,
+            theme = {
+                bgTop = {14, 24, 28},
+                bgBottom = {22, 42, 50},
+                ui = {228, 244, 244},
+                accent = {255, 210, 132},
+            },
+            layout = {
+                "1111111",
+                "0000001",
+                "1111111",
+                "1000000",
+                "1111111",
+                "0000001",
+                "1111111",
+                "1000000",
+                "0001000",
             },
         },
     },

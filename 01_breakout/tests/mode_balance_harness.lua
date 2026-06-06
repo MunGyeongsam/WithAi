@@ -1,4 +1,4 @@
-package.path = package.path .. ";project/src/?.lua;project/src/?/init.lua;project/src/?/?.lua"
+package.path = package.path .. ";01_breakout/src/?.lua;01_breakout/src/?/init.lua;01_breakout/src/?/?.lua"
 
 local ModeBalance = require("03_game.modes.modeBalance")
 

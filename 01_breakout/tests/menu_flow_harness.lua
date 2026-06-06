@@ -1,4 +1,4 @@
-package.path = package.path .. ";project/src/?.lua;project/src/?/init.lua;project/src/?/?.lua"
+package.path = package.path .. ";01_breakout/src/?.lua;01_breakout/src/?/init.lua;01_breakout/src/?/?.lua"
 
 local SceneStack = require("01_core.sceneStack")
 local TitleScene = require("03_game.scenes.titleScene")

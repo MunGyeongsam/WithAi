@@ -41,6 +41,7 @@ end
 local function makeBricks(width, height, levelInfo)
     local layout = levelInfo.layout
     local specialBricks = levelInfo.specialBricks or {}
+    local disableLockState = levelInfo.disableLockState == true
     local rows = #layout
     local cols = string.len(layout[1])
     local sidePadding = math.floor(width * 0.08)
@@ -75,7 +76,7 @@ local function makeBricks(width, height, levelInfo)
                     hp = special.hp
                 end
                 if kind == "lock" then
-                    locked = true
+                    locked = not disableLockState
                     lockGroup = special.group or "default"
                 elseif kind == "keyhole" then
                     unlockGroup = special.unlockGroup
@@ -148,6 +149,213 @@ local function aimNormToAngle(norm)
     return -math.pi * 0.5 + centered * SERVE_AIM_MAX_OFFSET
 end
 
+local function cloneBricksForSimulation(bricks)
+    local out = {}
+    for i = 1, #bricks do
+        local brick = bricks[i]
+        out[i] = {
+            x = brick.x,
+            y = brick.y,
+            w = brick.w,
+            h = brick.h,
+            alive = brick.alive,
+            hp = brick.hp,
+            kind = brick.kind,
+            locked = brick.locked,
+            lockGroup = brick.lockGroup,
+            unlockGroup = brick.unlockGroup,
+        }
+    end
+    return out
+end
+
+local function countAliveBricks(bricks)
+    local alive = 0
+    for i = 1, #bricks do
+        if bricks[i].alive then
+            alive = alive + 1
+        end
+    end
+    return alive
+end
+
+local function unlockSimulatedLocks(bricks, unlockGroup)
+    for i = 1, #bricks do
+        local brick = bricks[i]
+        if brick.alive and brick.kind == "lock" and brick.locked then
+            if unlockGroup == nil or brick.lockGroup == unlockGroup then
+                brick.locked = false
+            end
+        end
+    end
+end
+
+local function simulateShotResult(self, paddleNorm, aimNorm)
+    local paddleX = clamp(paddleNorm * self.width - self.paddle.w * 0.5, 0, self.width - self.paddle.w)
+    local paddle = {
+        x = paddleX,
+        y = self.paddle.y,
+        w = self.paddle.w,
+        h = self.paddle.h,
+    }
+    local ball = {
+        r = self.ball.r,
+        x = paddleX + self.paddle.w * 0.5,
+        y = self.paddle.y - self.ball.r,
+        vx = 0,
+        vy = 0,
+    }
+    launchBall(ball, self.ballSpeed, aimNormToAngle(aimNorm))
+
+    local bricks = cloneBricksForSimulation(self.bricks)
+    local totalAlive = countAliveBricks(bricks)
+    local broken = 0
+    local dt = 1 / 240
+    local maxSteps = 240 * 16
+
+    for step = 1, maxSteps do
+        local prevX = ball.x
+        local prevY = ball.y
+
+        ball.x = ball.x + ball.vx * dt
+        ball.y = ball.y + ball.vy * dt
+
+        if ball.x - ball.r <= 0 then
+            ball.x = ball.r
+            ball.vx = math.abs(ball.vx)
+        elseif ball.x + ball.r >= self.width then
+            ball.x = self.width - ball.r
+            ball.vx = -math.abs(ball.vx)
+        end
+
+        if ball.y - ball.r <= 0 then
+            ball.y = ball.r
+            ball.vy = math.abs(ball.vy)
+        end
+
+        if ball.y - ball.r > self.height then
+            break
+        end
+
+        if ball.vy > 0 and circleRectIntersect(ball.x, ball.y, ball.r, paddle) then
+            local hitOffset = ((ball.x - paddle.x) / paddle.w) * 2 - 1
+            hitOffset = clamp(hitOffset, -0.95, 0.95)
+            local speed = self.ballSpeed
+            ball.vx = speed * hitOffset
+            local vySquared = speed * speed - ball.vx * ball.vx
+            if vySquared < 0 then
+                vySquared = 0
+            end
+            ball.vy = -math.sqrt(vySquared)
+            ball.y = paddle.y - ball.r
+        end
+
+        for i = 1, #bricks do
+            local brick = bricks[i]
+            if brick.alive and circleRectIntersect(ball.x, ball.y, ball.r, brick) then
+                local isLocked = brick.kind == "lock" and brick.locked
+                if not isLocked then
+                    brick.hp = brick.hp - 1
+                    if brick.hp <= 0 then
+                        brick.alive = false
+                        broken = broken + 1
+                        if brick.kind == "keyhole" then
+                            unlockSimulatedLocks(bricks, brick.unlockGroup)
+                        end
+                    end
+                end
+
+                if prevY + ball.r <= brick.y then
+                    ball.vy = -math.abs(ball.vy)
+                elseif prevY - ball.r >= brick.y + brick.h then
+                    ball.vy = math.abs(ball.vy)
+                elseif prevX + ball.r <= brick.x then
+                    ball.vx = -math.abs(ball.vx)
+                elseif prevX - ball.r >= brick.x + brick.w then
+                    ball.vx = math.abs(ball.vx)
+                else
+                    ball.vy = -ball.vy
+                end
+                break
+            end
+        end
+
+        if broken >= totalAlive then
+            return {
+                broken = broken,
+                total = totalAlive,
+                steps = step,
+                cleared = true,
+            }
+        end
+    end
+
+    return {
+        broken = broken,
+        total = totalAlive,
+        steps = maxSteps,
+        cleared = broken >= totalAlive,
+    }
+end
+
+local function findBestServePreset(self)
+    local best = nil
+
+    local function updateBest(candidate)
+        if not best then
+            best = candidate
+            return
+        end
+
+        local betterByClear = candidate.cleared and not best.cleared
+        local betterByBroken = candidate.broken > best.broken
+        local betterByTime = (candidate.broken == best.broken) and (candidate.steps < best.steps)
+        if betterByClear or betterByBroken or betterByTime then
+            best = candidate
+        end
+    end
+
+    for p = 0, 20 do
+        local paddleNorm = 0.08 + p * 0.042
+        if paddleNorm > 0.92 then
+            paddleNorm = 0.92
+        end
+
+        for a = 1, 49 do
+            local aimNorm = a * 0.02
+            local result = simulateShotResult(self, paddleNorm, aimNorm)
+            updateBest({
+                paddleNorm = paddleNorm,
+                aimNorm = aimNorm,
+                broken = result.broken,
+                total = result.total,
+                steps = result.steps,
+                cleared = result.cleared,
+            })
+        end
+    end
+
+    if best then
+        for dp = -8, 8 do
+            local paddleNorm = clamp(best.paddleNorm + dp * 0.005, 0.05, 0.95)
+            for da = -10, 10 do
+                local aimNorm = clamp(best.aimNorm + da * 0.003, 0.01, 0.99)
+                local result = simulateShotResult(self, paddleNorm, aimNorm)
+                updateBest({
+                    paddleNorm = paddleNorm,
+                    aimNorm = aimNorm,
+                    broken = result.broken,
+                    total = result.total,
+                    steps = result.steps,
+                    cleared = result.cleared,
+                })
+            end
+        end
+    end
+
+    return best
+end
+
 local function isNaN(value)
     return value ~= value
 end
@@ -200,6 +408,12 @@ function Breakout.new(width, height, options)
     self.startLevel = 1
     self.time = 0
     self.modeId, self.mode = ModeRegistry.create(options and options.modeId)
+    self.startPaddleNorm = options and options.startPaddleNorm or nil
+    self.startServeAimNorm = options and options.startServeAimNorm or nil
+    self.findServePreset = options and options.findServePreset == true or false
+    self.autoLaunchOnServe = options and options.autoLaunchOnServe == true or false
+    self.lockServeAimUntilLaunch = false
+    self.pendingAutoLaunch = false
     if options and type(options.startLevel) == "number" then
         self.startLevel = math.floor(options.startLevel)
     end
@@ -359,6 +573,51 @@ function Breakout:reset(width, height)
     end
 
     self:loadLevel(self.startLevel)
+
+    if self.findServePreset and self.state == STATE.SERVE and #self.bricks > 0 then
+        local bestPreset = findBestServePreset(self)
+        if bestPreset then
+            self.startPaddleNorm = bestPreset.paddleNorm
+            self.startServeAimNorm = bestPreset.aimNorm
+            if bestPreset.cleared then
+                self:spawnScorePopup(self.width * 0.5, self.height * 0.44, "AUTO ROUTE READY")
+            else
+                self:spawnScorePopup(
+                    self.width * 0.5,
+                    self.height * 0.44,
+                    "BEST ROUTE " .. tostring(bestPreset.broken) .. "/" .. tostring(bestPreset.total)
+                )
+            end
+        end
+    end
+
+    if self.state == STATE.SERVE then
+        local applied = false
+
+        if type(self.startPaddleNorm) == "number" then
+            local paddleNorm = clamp(self.startPaddleNorm, 0, 1)
+            self.paddle.x = clamp(paddleNorm * self.width - self.paddle.w * 0.5, 0, self.width - self.paddle.w)
+            applied = true
+        end
+
+        if type(self.startServeAimNorm) == "number" then
+            self.serveAimNorm = clamp(self.startServeAimNorm, 0, 1)
+            self.serveAimAngle = aimNormToAngle(self.serveAimNorm)
+            self.lockServeAimUntilLaunch = true
+            applied = true
+        else
+            self.lockServeAimUntilLaunch = false
+        end
+
+        if applied then
+            self:resetBallToPaddle()
+        end
+
+        self.pendingAutoLaunch = self.autoLaunchOnServe
+    else
+        self.lockServeAimUntilLaunch = false
+        self.pendingAutoLaunch = false
+    end
 end
 
 function Breakout:resize(width, height)
@@ -641,6 +900,7 @@ function Breakout:updateBall(dt)
                         self:spawnScorePopup(brick.x + brick.w * 0.5, brick.y - 16, "RISK +" .. tostring(tokenGain))
                     end
                 end
+
                 self:addShake(4, 0.06)
             else
                 local gained = self.mode:awardBrickPoints(self, 25)
@@ -710,12 +970,21 @@ function Breakout:update(dt)
     end
 
     if self.state == STATE.SERVE then
-        if self.inputSnapshot.serveAimNorm ~= nil then
+        if (not self.lockServeAimUntilLaunch) and self.inputSnapshot.serveAimNorm ~= nil then
             self.serveAimNorm = clamp(self.inputSnapshot.serveAimNorm, 0, 1)
             self.serveAimAngle = aimNormToAngle(self.serveAimNorm)
         end
+        if self.pendingAutoLaunch then
+            launchBall(self.ball, self.ballSpeed, self.serveAimAngle)
+            self.pendingAutoLaunch = false
+            self.lockServeAimUntilLaunch = false
+            self:setState(STATE.PLAYING)
+            return
+        end
         if self.inputSnapshot.launchPressed then
             launchBall(self.ball, self.ballSpeed, self.serveAimAngle)
+            self.pendingAutoLaunch = false
+            self.lockServeAimUntilLaunch = false
             self:setState(STATE.PLAYING)
             return
         end
