@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "love",
             "args": [
-                "${workspaceFolder}/project/src"
+                "${workspaceFolder}/01_breakout/src"
             ],
             "group": {
                 "kind": "build",
@@ -22,7 +22,7 @@
             "type": "shell",
             "command": "love",
             "args": [
-                "${workspaceFolder}/project/src"
+                "${workspaceFolder}/01_breakout/src"
             ],
             "problemMatcher": []
         },
@@ -54,6 +54,21 @@
             "args": [
                 "${file}"
             ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Love2D: Run Tower Defense",
+            "type": "shell",
+            "command": "love",
+            "args": [
+                "${workspaceFolder}/02_tower_defense/src"
+            ],
+            "windows": {
+                "command": "${workspaceFolder}/love-11.5-win64/lovec.exe",
+                "args": [
+                    "${workspaceFolder}/02_tower_defense/src"
+                ]
+            },
             "problemMatcher": []
         }
     ]
