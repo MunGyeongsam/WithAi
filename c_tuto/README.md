@@ -15,3 +15,10 @@
 ## 권장 빌드 옵션
 
 - gcc -std=c11 -Wall -Wextra -Werror -pedantic
+
+
+## 주차별 읽는 순서
+- 강좌 : lessone.md
+- 연습문제 : practice.md
+- 모범답안 : answers.md
+- 좀 더 ~ : further-more.md
