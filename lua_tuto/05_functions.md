@@ -19,8 +19,25 @@ function globalFunc()
 end
 ```
 
-> **⚠️ 순서 주의**: `local function`으로 선언해야 같은 파일 내에서 순서에 덜 민감하다.  
-> `local f = function()` 형태는 선언 전에 호출하면 nil 에러.
+> **⚠️ 순서 주의**: 두 형태 모두 선언 이전 줄에서 호출하면 nil 에러가 난다.  
+> 차이점은 **함수 본문 안에서 자기 이름을 참조(재귀)**할 수 있느냐이다.
+>
+> ```lua
+> -- OK: local function은 본문에서 자기 자신 참조 가능
+> local function f(n)
+>     if n <= 1 then return 1 end
+>     return n * f(n - 1)        -- f가 이미 로컬에 존재
+> end
+>
+> -- ERROR: local f = function() 은 대입 완료 전이라 f가 nil
+> local g = function(n)
+>     if n <= 1 then return 1 end
+>     return n * g(n - 1)        -- g는 아직 nil!
+> end
+> ```
+>
+> `local function f() end`는 내부적으로 `local f; f = function() end`로 변환되어  
+> 함수 본문이 만들어질 때 이미 `f` 변수가 스코프에 존재하기 때문이다.
 
 ## 다중 반환값
 
