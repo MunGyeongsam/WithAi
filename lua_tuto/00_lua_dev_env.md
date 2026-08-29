@@ -101,6 +101,28 @@ code --install-extension sumneko.lua
 | Code Runner | `formulahendry.code-runner` | 단축키 한 번으로 현재 파일 실행 |
 | Error Lens | `usernamehw.errorlens` | 에러를 코드 옆에 인라인 표시 |
 
+### Code Runner 설정
+
+Code Runner를 설치하면 `Ctrl+Alt+N` (macOS: `Ctrl+Opt+N`)으로 현재 파일을 바로 실행할 수 있다.
+
+`.vscode/settings.json`에 아래를 추가하면 Lua 5.1로 실행된다:
+
+```json
+{
+  "code-runner.executorMap": {
+    "lua": "lua5.1"
+  },
+  "code-runner.runInTerminal": true,
+  "code-runner.clearPreviousOutput": true
+}
+```
+
+- `code-runner.executorMap` — Lua 파일을 `lua5.1` 명령으로 실행
+- `code-runner.runInTerminal` — 출력 패널 대신 터미널에서 실행 (`io.read()` 등 입력이 가능해짐)
+- `code-runner.clearPreviousOutput` — 실행할 때마다 이전 출력을 자동으로 지움
+
+> ⚠️ Windows에서 `lua.exe`로 이름을 바꿨다면 `"lua": "lua"`로 설정한다.
+
 ### 워크스페이스 설정 (선택)
 
 프로젝트 루트에 `.vscode/settings.json`을 만들어 sumneko가 Lua 5.1 모드로 동작하게 한다:
