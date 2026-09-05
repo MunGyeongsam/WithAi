@@ -98,6 +98,15 @@ end
 
 ## 함수는 일급 객체 (First-Class)
 
+"함수는 일급 객체다"는 함수가 단지 호출하는 문법이 아니라, 숫자나 문자열처럼 **값으로 다뤄진다**는 뜻이다. 따라서 함수는 다음과 같이 사용할 수 있다.
+
+- 변수나 테이블에 저장한다.
+- 다른 함수의 인자로 전달한다.
+- 다른 함수의 반환값으로 받는다.
+- 필요한 시점에 나중에 호출한다.
+
+함수 이름 뒤의 괄호 유무가 특히 중요하다. `greet`는 함수 **값 자체**를 가리키고, `greet("Lua")`는 함수를 **즉시 호출한 결과값**이다.
+
 ```lua
 -- 함수를 변수에 담을 수 있다
 local greet = function(name)
@@ -121,9 +130,39 @@ local triple = multiplier(3)
 print(double(5))    -- 10
 print(triple(5))    -- 15
 
--- C# 비교: Func<T>, Action, delegate와 유사
--- C 비교: 함수 포인터와 유사하지만 훨씬 유연
+-- 테이블에도 저장할 수 있다
+local commands = {
+    attack = function()
+        return "attack"
+    end,
+}
+print(commands.attack())    -- "attack"
 ```
+
+### 다른 언어와 비교
+
+| 언어 | 함수를 값으로 다루는 방법 | Lua와의 차이 |
+| --- | --- | --- |
+| Lua | 함수 자체를 변수, 테이블, 인자, 반환값으로 사용 | 별도 선언 없이 자연스럽게 사용 |
+| C | 함수 포인터 `int (*op)(int, int)` 사용 | 함수 타입을 명시해야 하며, 지역 상태를 자동으로 기억하지 않음 |
+| C++ | 함수 포인터, 람다, 함수 객체, `std::function` 사용 | 람다의 캡처 방식과 객체 수명을 명시적으로 고려해야 함 |
+| C# | `delegate`, `Action`, `Func<T>`, 람다 사용 | 엄밀히는 메서드 자체보다 호출 가능한 delegate 값을 전달함 |
+
+Lua의 `local operation = greet`는 C#의 다음 코드와 비슷하다.
+
+```csharp
+Func<string, string> operation = greet;
+Console.WriteLine(operation("Lua"));
+```
+
+C에서는 함수 포인터 타입을 직접 선언해야 한다.
+
+```c
+char *greet(const char *name);
+char *(*operation)(const char *) = greet;
+```
+
+Lua는 함수가 값인 데서 한 걸음 더 나아가, 반환된 함수가 바깥 지역 변수를 기억하는 **클로저**를 기본 지원한다. 위의 `multiplier`에서 `double`은 호출이 끝난 뒤에도 `factor` 값 `2`를 기억한다. 다음 절의 클로저는 이 성질을 이용해 상태를 함수 안에 안전하게 보관하는 방법을 다룬다.
 
 ## 클로저 (Closure)
 
