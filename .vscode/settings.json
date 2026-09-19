@@ -15,9 +15,15 @@
         "${3rd}/love2d/library"
     ],
     "code-runner.executorMap": {
-        "lua": "lua"
+        "lua": "/opt/homebrew/bin/lua5.1"
     },
     "code-runner.runInTerminal": false,
     "code-runner.saveFileBeforeRun": true,
-    "code-runner.clearPreviousOutput": true
+    "code-runner.clearPreviousOutput": true,
+    "chat.tools.terminal.autoApprove": {
+        "/^lua lua_tuto/design_patterns/behavioral/state/example_02\\.lua && lua lua_tuto/design_patterns/behavioral/state/example_03\\.lua$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
 }

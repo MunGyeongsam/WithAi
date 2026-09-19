@@ -1,3 +1,35 @@
+-- Before: all state-specific behavior accumulates in one Context method.
+local conditional_document = { state = "draft", message = "" }
+
+function conditional_document:apply(action)
+    if self.state == "draft" then
+        if action == "submit" then
+            self.message = "sent to review"
+            self.state = "review"
+        else
+            self.message = "editing"
+        end
+    elseif self.state == "review" then
+        if action == "approve" then
+            self.message = "published"
+            self.state = "published"
+        elseif action == "reject" then
+            self.message = "needs changes"
+            self.state = "draft"
+        else
+            self.message = "review required"
+        end
+    elseif self.state == "published" then
+        self.message = "read-only"
+    end
+end
+
+conditional_document:apply("submit")
+conditional_document:apply("reject")
+assert(conditional_document.state == "draft" and conditional_document.message == "needs changes")
+print("conditional:", conditional_document.message)
+
+-- After: the Context delegates state-specific behavior to the current State.
 local document = { state = nil, message = "" }
 
 local draft, review, published

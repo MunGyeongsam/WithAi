@@ -515,6 +515,15 @@ local function safeGet(t, ...)
     return t
 end
 
+local function safeGet2(t, ...)
+    local args = {...}
+    for i,v in ipairs(args) do
+        if type(t) ~= "table" then return nil end
+        t = t[v]
+    end
+    return t
+end
+
 print(safeGet(game, "enemy", "pos", "x"))    -- nil
 print(safeGet(game, "player", "pos", "x"))   -- 10
 ```

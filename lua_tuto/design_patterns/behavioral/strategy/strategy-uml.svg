@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title description">
+    <title id="title">Strategy pattern UML diagram</title>
+    <desc id="description">Navigator delegates route building to a RouteStrategy implemented by Road, Public Transport, and Walking strategies.</desc>
+    <rect width="1200" height="560" fill="#ffffff"/>
+    <g fill="#f7f7f7" stroke="#4b4b4b" stroke-width="5" stroke-linejoin="round">
+        <rect x="220" y="38" width="280" height="180" rx="5"/>
+        <rect x="720" y="58" width="280" height="160" rx="5"/>
+        <rect x="570" y="335" width="250" height="100" rx="5"/>
+        <rect x="905" y="335" width="250" height="100" rx="5"/>
+        <rect x="735" y="470" width="250" height="100" rx="5"/>
+    </g>
+    <g stroke="#4b4b4b" stroke-width="5">
+        <path d="M220 98h280M220 158h280M720 118h280M570 335h250M905 335h250M735 470h250"/>
+        <path d="M500 128h180" fill="none"/>
+        <path d="M680 128l-28-14m28 14l-28 14" fill="none"/>
+        <path d="M502 128l20-16 20 16-20 16z" fill="#ffffff"/>
+        <path d="M695 294V270h470v24M835 335v-92M1030 335v-65M860 470v-65" fill="none" stroke-dasharray="12 8"/>
+        <path d="M860 244V218M838 244l22-38 22 38z" fill="#ffffff"/>
+        <path d="M255 218v45" fill="none" stroke-dasharray="10 8"/>
+    </g>
+    <g fill="#4b4b4b" font-family="Arial, sans-serif" text-anchor="middle">
+        <text x="360" y="78" font-size="30" font-weight="700">Navigator</text>
+        <text x="360" y="138" font-size="27" text-anchor="start">- routeStrategy</text>
+        <text x="360" y="198" font-size="27" text-anchor="start">+ buildRoute(A, B)</text>
+        <text x="860" y="95" font-size="26">&lt;&lt;interface&gt;&gt;</text>
+        <text x="860" y="140" font-size="30" font-weight="700">RouteStrategy</text>
+        <text x="860" y="198" font-size="27" text-anchor="start">+ buildRoute(A, B)</text>
+        <text x="695" y="375" font-size="30" font-weight="700">Road</text>
+        <text x="695" y="412" font-size="30" font-weight="700">Strategy</text>
+        <text x="1030" y="375" font-size="29" font-weight="700">Public Transport</text>
+        <text x="1030" y="412" font-size="30" font-weight="700">Strategy</text>
+        <text x="860" y="510" font-size="30" font-weight="700">Walking</text>
+        <text x="860" y="547" font-size="30" font-weight="700">Strategy</text>
+    </g>
+    <rect x="20" y="260" width="470" height="65" fill="#f7f7f7" stroke="#4b4b4b" stroke-width="5"/>
+    <text x="40" y="302" fill="#4b4b4b" font-family="Arial, sans-serif" font-size="25">route = routeStrategy.buildRoute(A, B)</text>
+</svg>

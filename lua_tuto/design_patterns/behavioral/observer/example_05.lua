@@ -17,16 +17,22 @@ end
 
 function Event.emit(name, payload)
     local listeners = Event.listeners[name] or {}
-    for _, listener in ipairs(listeners) do listener(payload) end
+    local snapshot = {}
+    for index, listener in ipairs(listeners) do snapshot[index] = listener end
+    for _, listener in ipairs(snapshot) do listener(payload) end
 end
 
 local log = ""
-local damage_listener = function(amount) log = log .. "damage=" .. amount end
+local damage_listener
+damage_listener = function(amount)
+    log = log .. "once=" .. amount
+    Event.off("damage", damage_listener)
+end
 Event.on("damage", damage_listener)
+Event.on("damage", function(amount) log = log .. "damage=" .. amount end)
 Event.on("heal", function(amount) log = log .. "heal=" .. amount end)
 Event.emit("damage", 15)
 Event.emit("heal", 5)
-Event.off("damage", damage_listener)
 Event.emit("damage", 20)
-assert(log == "damage=15heal=5")
+assert(log == "once=15damage=15heal=5damage=20")
 print(log)

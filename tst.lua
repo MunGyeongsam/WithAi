@@ -10,5 +10,8 @@ print(name, hp, mp)    -- Slime  100  50
 local name = findEnemy()    -- hp, mp 버려짐
 
 -- 관례: 불필요한 값은 _ 로 받는다
-local _, _, mp = findEnemy()
+local a, a, mp = findEnemy()
+local a = 3
+local a = 'hello'
 
+print(a)
