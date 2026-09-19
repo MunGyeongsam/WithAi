@@ -6,8 +6,12 @@ end
 local function cached(action)
     local cache = {}
     return function(name)
-        if not cache[name] then cache[name] = action(name) end
-        return cache[name]
+        local value = cache[name]
+        if value == nil then
+            value = action(name)
+            cache[name] = value
+        end
+        return value
     end
 end
 

@@ -10,7 +10,12 @@ function proxy:load(name)
 	self.cache[name] = self.cache[name] or real:load(name)
 	return self.cache[name]
 end
+function proxy:reset(name)
+	self.cache[name] = nil
+end
 
 assert(proxy:load("map") == "loaded:map")
 assert(proxy:load("map") == "loaded:map" and load_count == 1)
+proxy:reset("map")
+assert(proxy:load("map") == "loaded:map" and load_count == 2)
 print(proxy:load("map"), load_count)

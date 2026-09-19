@@ -1,18 +1,28 @@
-local prototypes = {
-    coin = { kind = "coin", value = 10 },
-    gem = { kind = "gem", value = 50 }
-}
+local function prototype(kind, value)
+    return {
+        kind = kind,
+        value = value,
+        clone = function(self)
+            return { kind = self.kind, value = self.value }
+        end
+    }
+end
 
-local function spawn(kind, x, y)
-    local template = prototypes[kind]
-    assert(template, "unknown prototype")
-    local object = {}
-    for key, value in pairs(template) do object[key] = value end
+local registry = {}
+function registry:register(kind, template)
+    self[kind] = template
+end
+function registry:create(kind, x, y)
+    local template = assert(self[kind], "unknown prototype")
+    local object = template:clone()
     object.x, object.y = x, y
     return object
 end
 
-local coin = spawn("coin", 4, 8)
-local gem = spawn("gem", 10, 12)
+registry:register("coin", prototype("coin", 10))
+registry:register("gem", prototype("gem", 50))
+
+local coin = registry:create("coin", 4, 8)
+local gem = registry:create("gem", 10, 12)
 assert(coin.kind == "coin" and gem.kind == "gem")
 print(coin.kind, coin.x, coin.y, gem.kind, gem.value)

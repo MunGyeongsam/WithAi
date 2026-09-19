@@ -8,4 +8,5 @@ local function bonus_reward(amount, next_handler)
 end
 
 assert(bonus_reward(100, base_reward) == 120)
+assert(bonus_reward(50, base_reward) == 55)
 print(bonus_reward(50, base_reward))

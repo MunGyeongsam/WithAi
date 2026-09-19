@@ -15,7 +15,8 @@ function proxy:flush()
 end
 
 assert(proxy:send("hello") == "queued:hello")
+assert(proxy:send("world") == "queued:world")
 proxy.online = true
 local sent = proxy:flush()
-assert(sent[1] == "sent:hello" and #proxy.queue == 0)
-print(sent[1])
+assert(sent[1] == "sent:hello" and sent[2] == "sent:world" and #proxy.queue == 0)
+print(sent[1], sent[2])

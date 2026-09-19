@@ -8,17 +8,21 @@ function editor:restore(snapshot)
 	self.text = snapshot.text
 end
 
-local history = {}
-local function checkpoint()
-	history[#history + 1] = editor:save()
+local history = { snapshots = {} }
+function history:push(snapshot)
+	self.snapshots[#self.snapshots + 1] = snapshot
+end
+function history:pop()
+	local snapshot = self.snapshots[#self.snapshots]
+	self.snapshots[#self.snapshots] = nil
+	return snapshot
 end
 
-checkpoint()
+history:push(editor:save())
 editor.text = "after"
-checkpoint()
+history:push(editor:save())
 editor.text = "latest"
-editor:restore(history[#history])
-history[#history] = nil
-editor:restore(history[#history])
+editor:restore(history:pop())
+editor:restore(history:pop())
 assert(editor.text == "before")
 print(editor.text)

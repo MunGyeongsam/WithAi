@@ -11,5 +11,6 @@ end
 
 local log = {}
 local decorated = logged(critical(attack, 2), log)
-assert(decorated(10) == 20 and log[1] == 10)
-print(decorated(10), log[1])
+local damage = decorated(10)
+assert(damage == 20 and log[1] == 10 and #log == 1)
+print(damage, log[1])

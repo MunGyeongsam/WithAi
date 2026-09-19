@@ -21,4 +21,5 @@ end, quit)
 
 assert(pause:handle("pause") == "paused")
 assert(pause:handle("quit") == "quit")
+assert(pause:handle("unknown") == "unhandled")
 print(pause:handle("unknown"))

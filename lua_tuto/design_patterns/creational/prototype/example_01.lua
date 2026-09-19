@@ -1,12 +1,12 @@
-local function clone(source)
-    local copy = {}
-    for key, value in pairs(source) do copy[key] = value end
-    return copy
+local slime_prototype = { kind = "slime", stats = { hp = 20 } }
+function slime_prototype:clone()
+    return {
+        kind = self.kind,
+        stats = { hp = self.stats.hp }
+    }
 end
 
-local slime_prototype = { kind = "slime", stats = { hp = 20 } }
-local enemy = clone(slime_prototype)
-enemy.stats = clone(slime_prototype.stats)
+local enemy = slime_prototype:clone()
 enemy.stats.hp = 10
 
 assert(enemy ~= slime_prototype)
