@@ -1,10 +1,17 @@
 local csv_reader = { read = function() return { "sword", "12" } end }
-local item_reader = {
+
+local csv_item_adapter = {
 	load = function()
 		local row = csv_reader.read()
-		return { name = row[1], damage = tonumber(row[2]) }
+		local damage = tonumber(row[2])
+		if not row[1] or not damage then
+			return nil, "invalid item row"
+		end
+		return { name = row[1], damage = damage }
 	end
 }
-local item = item_reader.load()
+
+local item, err = csv_item_adapter.load()
+assert(not err)
 assert(item.name == "sword" and item.damage == 12)
 print(item.name, item.damage)

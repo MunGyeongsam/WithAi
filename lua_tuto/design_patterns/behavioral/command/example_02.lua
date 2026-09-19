@@ -20,4 +20,6 @@ end
 invoker:enqueue(create_action("jump"))
 invoker:enqueue(create_action("attack"))
 local results = invoker:run_all()
+assert(table.concat(results, ",") == "jump,attack")
+assert(#invoker.queue == 0)
 print(table.concat(results, ","))

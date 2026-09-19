@@ -1,8 +1,12 @@
-local old_renderer = { drawRect = function(_, x, y, w, h) return x + y + w + h end }
-local renderer = {
-	rectangle = function(x, y, width, height)
-		return old_renderer:drawRect(x, y, width, height)
+local old_renderer = {
+	drawBox = function(_, left, top, right, bottom)
+		return left + top + right + bottom
 	end
 }
-assert(renderer.rectangle(1, 2, 3, 4) == 10)
+local renderer = {
+	rectangle = function(x, y, width, height)
+		return old_renderer:drawBox(x, y, x + width, y + height)
+	end
+}
+assert(renderer.rectangle(1, 2, 3, 4) == 13)
 print(renderer.rectangle(1, 2, 3, 4))
