@@ -1,20 +1,28 @@
-local function start_game(load_assets, show_menu)
-	local assets = load_assets()
-	return show_menu(assets)
+-- Fixed start sequence with a required step, a default hook, and an optional override.
+local function start_game(steps)
+	local events = {}
+	local assets = steps.load_assets()
+	events[#events + 1] = "load"
+	local on_ready = steps.on_ready or function() end
+	on_ready(events)
+	local menu = steps.show_menu(assets)
+	events[#events + 1] = "menu"
+	return menu, events
 end
 
-local events = {}
-local result = start_game(
-	function()
-		events[#events + 1] = "load"
-		return "assets"
-	end,
-	function(value)
-		events[#events + 1] = "menu"
-		return "menu:" .. value
-	end
-)
+local with_hook, hook_events = start_game({
+	load_assets = function() return "assets" end,
+	on_ready = function(events) events[#events + 1] = "warmup" end,
+	show_menu = function(assets) return "menu:" .. assets end
+})
 
-assert(result == "menu:assets")
-assert(table.concat(events, "->") == "load->menu")
-print(result, table.concat(events, "->"))
+local default_hook, default_events = start_game({
+	load_assets = function() return "assets" end,
+	show_menu = function(assets) return "menu:" .. assets end
+})
+
+assert(with_hook == "menu:assets")
+assert(table.concat(hook_events, "->") == "load->warmup->menu")
+assert(default_hook == "menu:assets")
+assert(table.concat(default_events, "->") == "load->menu")
+print(table.concat(hook_events, "->"), table.concat(default_events, "->"))

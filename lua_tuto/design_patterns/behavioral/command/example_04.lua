@@ -16,6 +16,8 @@ end
 
 local command = create_add_command(3)
 command.execute()
+assert(receiver.value == 3)
 history[#history + 1] = command
 history[#history]:undo()
+assert(receiver.value == 0)
 print(receiver.value)

@@ -13,7 +13,11 @@ function EventBus.emit(event_name, value)
 end
 
 local received = 0
+local log = {}
 EventBus.on("score", function(value) received = received + value end)
+EventBus.on("score", function(value) log[#log + 1] = "score+" .. value end)
 EventBus.emit("score", 10)
-assert(received == 10)
-print(received)
+EventBus.emit("score", 5)
+assert(received == 15)
+assert(#log == 2 and log[1] == "score+10" and log[2] == "score+5")
+print(received, table.concat(log, ","))

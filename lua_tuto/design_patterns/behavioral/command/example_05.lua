@@ -17,4 +17,5 @@ local macro = {
 }
 
 macro:execute()
+assert(table.concat(log, ",") == "move,attack")
 print(table.concat(log, ","))

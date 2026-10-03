@@ -8,6 +8,7 @@ function area:visit_circle(shape) return math.pi * shape.radius ^ 2 end
 function area:visit_square(shape) return shape.side ^ 2 end
 
 local results = {}
-for _, shape in ipairs(shapes) do results[#results + 1] = area and shape:accept(area) end
+for _, shape in ipairs(shapes) do results[#results + 1] = shape:accept(area) end
+assert(results[1] == math.pi * 4)
 assert(results[2] == 9)
 print(results[1], results[2])

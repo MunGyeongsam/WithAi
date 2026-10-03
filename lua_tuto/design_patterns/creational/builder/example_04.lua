@@ -5,7 +5,9 @@ local function query_builder()
     function builder:limit(value) query.limit = value; return self end
     function builder:build()
         assert(query.limit and query.limit > 0, "positive limit is required")
-        return { filters = query.filters, limit = query.limit }
+        local filters = {}
+        for key, value in pairs(query.filters) do filters[key] = value end
+        return { filters = filters, limit = query.limit }
     end
     return builder
 end
