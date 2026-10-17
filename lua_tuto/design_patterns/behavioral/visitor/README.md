@@ -56,6 +56,78 @@ Visitor는 **Element 종류는 안정적이고 연산 종류가 늘어나는 경
 - 타입 종류와 연산이 모두 적다면 Visitor는 과한 추상화입니다.
 - Iterator와 혼동하지 않습니다. Iterator는 원소 타입을 구분하지 않고 "다음 원소 접근"만 캡슐화하고, Visitor는 "원소 종류별 연산"을 이중 디스패치로 분리합니다. Iterator로 순회하며 각 원소에 Visitor를 적용해 함께 쓸 수도 있습니다.
 
+## C++ STL로 비교하기 (Iterator vs Visitor)
+
+두 패턴의 핵심 차이는 **"무엇을 순회하느냐"(Iterator)** 와 **"순회하면서 무엇을 할지를 분리"(Visitor)** 입니다. C++ STL에서 각각 분명하게 드러납니다.
+
+### Iterator — STL의 `iterator`
+
+STL 컨테이너는 내부 구조(연속 배열, 연결 리스트, 트리)를 숨기고 **동일한 순회 인터페이스**를 제공합니다. 이것이 Iterator 패턴 그 자체입니다.
+
+```cpp
+std::vector<int> v = {1, 2, 3};
+std::list<int>   l = {1, 2, 3};
+
+// 내부 구조가 완전히 다른데도 순회 코드는 동일하다
+for (auto it = v.begin(); it != v.end(); ++it) std::cout << *it;
+for (auto it = l.begin(); it != l.end(); ++it) std::cout << *it;
+```
+
+| 패턴 역할 | STL 대응 |
+|-----------|----------|
+| `Aggregate` (집합체) | `vector`, `list`, `map` |
+| `createIterator()` | `begin()`, `end()` |
+| `Iterator.next()` | `++it` |
+| `Iterator.current()` | `*it` |
+| `Iterator.hasNext()` | `it != end()` |
+
+클라이언트는 내부 구현을 몰라도 됩니다. `std::sort`나 `std::find` 같은 알고리즘이 모든 컨테이너에 재사용되는 것도 iterator 추상화 덕분입니다.
+
+### Visitor — `std::variant` + `std::visit`
+
+Visitor는 **데이터 구조는 그대로 두고, 그 위에서 수행할 "연산"을 바깥에서 주입**합니다. C++17의 `std::variant` / `std::visit`가 전형적인 예입니다.
+
+```cpp
+using Shape = std::variant<Circle, Rectangle, Triangle>;
+
+// Visitor: 타입별로 다른 동작을 모아 둔 객체
+struct AreaVisitor {
+	double operator()(const Circle& c)    const { return 3.14 * c.r * c.r; }
+	double operator()(const Rectangle& r) const { return r.w * r.h; }
+	double operator()(const Triangle& t)  const { return 0.5 * t.base * t.height; }
+};
+
+Shape s = Circle{2.0};
+double area = std::visit(AreaVisitor{}, s); // 실제 타입에 맞는 operator() 호출
+```
+
+| 패턴 역할 | STL 대응 |
+|-----------|----------|
+| `Element` 계층 | `variant`가 담는 각 타입(`Circle`, `Rectangle`…) |
+| `Visitor` | `AreaVisitor` (타입별 `operator()` 묶음) |
+| `accept(visitor)` | `std::visit(visitor, var)` |
+| `visit_*()` | 오버로딩된 `operator()` |
+
+`std::visit`가 **이중 디스패치**를 대신해 줍니다. `variant`에 실제로 어떤 타입이 들어 있는지(런타임)와 어떤 연산을 할지(`AreaVisitor`)를 조합해 올바른 함수를 호출합니다. 둘레 계산 `PerimeterVisitor`를 추가해도 `Circle` 같은 데이터 타입은 수정하지 않습니다.
+
+### 두 패턴을 함께 쓰기
+
+실무에서는 iterator로 컨테이너를 돌면서 각 원소에 visitor를 적용하는 식으로 자주 결합합니다.
+
+```cpp
+std::vector<Shape> shapes = {Circle{1}, Rectangle{2, 3}};
+double total = 0;
+for (auto it = shapes.begin(); it != shapes.end(); ++it) // Iterator: 순회
+	total += std::visit(AreaVisitor{}, *it);             // Visitor: 타입별 연산
+```
+
+```
+Iterator : 구조를 숨기고 "순회"를 통일   → 원소를 하나씩 꺼내는 책임
+Visitor  : 구조는 열어두고 "연산"을 분리  → 꺼낸 원소마다 타입별 처리
+```
+
+> 참고: 전통적 GoF Visitor는 `accept(Visitor&)` 가상 함수와 `visitCircle()` 같은 메서드로 구현하지만, 모던 C++에서는 상속 없이 같은 효과를 내는 `variant`/`visit` 조합을 더 선호합니다. 위 Lua 예제의 `accept`/`visit_*` 계약이 GoF 방식에 해당합니다.
+
 ## 게임 개발 시나리오
 
 객체 구조는 그대로 두고 새 연산을 분리해 추가할 때 Visitor가 유용합니다.
