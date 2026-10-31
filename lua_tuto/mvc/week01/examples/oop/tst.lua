@@ -30,23 +30,23 @@ Dog, Cat, Eagle, Penguin(2단계 상속)
 --]]
 
 
-local Animal = require "oop.Animal"
-local Mammal = require "oop.Mammal"
-local Bird = require "oop.Bird"
-local Dog = require "oop.Dog"
-local Cat = require "oop.Cat"
-local Eagle = require "oop.Eagle"
-local Penguin = require "oop.Penguin"
+local Animal = require  "Animal"
+local Mammal = require  "Mammal"
+local Bird = require    "Bird"
+local Dog = require     "Dog"
+local Cat = require     "Cat"
+local Eagle = require   "Eagle"
+local Penguin = require "Penguin"
 
 
 -- ============ 테스트 ============
 local function run_tests()
    print("=== 동물 상속 및 오버라이딩 테스트 ===\n")
   
-   local dog = Dog("Max")
-   local cat = Cat("Whiskers")
-   local eagle = Eagle("Sky")
-   local penguin = Penguin("Waddles")
+   local dog = Dog.new("Max", 3)
+   local cat = Cat.new("Whiskers", 2)
+   local eagle = Eagle.new("Sky", 5)
+   local penguin = Penguin.new("Waddles", 4)
   
    -- 1. 부모 메서드 상속
    print("1. 부모 메서드 상속 (Animal.getInfo):")
