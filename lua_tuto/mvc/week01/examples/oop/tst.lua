@@ -29,10 +29,16 @@ Dog, Cat, Eagle, Penguin(2단계 상속)
   특화 메서드 추가
 --]]
 
--- 현재 스크립트의 디렉토리 경로 설정
-local scriptPath = debug.getinfo(1).source:sub(2)  -- @ 제거
-local scriptDir = scriptPath:match("(.*/)")
+-- 현재 스크립트의 디렉토리 경로 설정 (Windows/macOS/Linux 호환)
+local scriptPath = debug.getinfo(1).source
+if scriptPath:sub(1, 1) == "@" then
+  scriptPath = scriptPath:sub(2)
+end
+-- Windows와 Unix 경로 모두 처리
+local scriptDir = scriptPath:match("(.+[/\\])")
 if scriptDir then
+  -- 백슬래시를 슬래시로 정규화 (Windows)
+  scriptDir = scriptDir:gsub("\\", "/")
   package.path = scriptDir .. "?.lua;" .. package.path
 end
 
