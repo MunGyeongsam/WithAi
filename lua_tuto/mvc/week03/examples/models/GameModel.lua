@@ -43,7 +43,7 @@ function GameModel:reset()
   self.state = "playing" -- "playing" | "gameover"
   self.formationDir = 1
   self.enemyFireTimer = ENEMY_FIRE_INTERVAL
-  self.events = {} -- View 가 매 프레임 소비하는 "사실" 목록
+  self.events = {} -- 스텝마다 쌓이고, 소비자(View)가 drainEvents() 로 비운다
   self:spawnFormation()
 end
 
@@ -59,12 +59,26 @@ function GameModel:_emit(evt)
   self.events[#self.events + 1] = evt
 end
 
+--- 쌓인 이벤트를 넘기고 비운다. 프레임당 1회(모든 고정 스텝이 끝난 뒤) 호출한다.
+-- @return table  이벤트 배열 (아래 "이벤트 계약" 참고)
+function GameModel:drainEvents()
+  local out = self.events
+  self.events = {}
+  return out
+end
+
 --- 매 프레임 1스텝. 모든 상태 변경은 여기서만.
 -- @param dt    number
 -- @param input table  { move = -1|0|1, fire = boolean }
+--
+-- 이벤트 계약 (GameModel → View):
+--   { type = "fire" }
+--   { type = "enemy_destroyed", x = number, y = number }
+--   { type = "player_hit" }
+--   { type = "game_over" }
+--   { type = "formation_cleared" }
 function GameModel:update(dt, input)
-  -- 이벤트는 매 프레임 새로 수집(View 가 직전 프레임 것을 이미 소비)
-  self.events = {}
+  -- 여기서 events 를 비우면 한 프레임에 스텝이 여러 번 돈 때 앞 스텝 이벤트가 사라진다.
   if self.state == "gameover" then
     return
   end

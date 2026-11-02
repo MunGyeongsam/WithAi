@@ -69,6 +69,7 @@
 | [cheatsheet.md](cheatsheet.md) | Lua ↔ C/C# 빠른 비교표 |
 | [lua_builtin_index.md](lua_builtin_index.md) | Lua 5.1 기본 함수/표준 라이브러리 색인 |
 | [exercises/](exercises/) | 챕터별 연습문제 정답 코드 |
+| [mvc/basics/](mvc/basics/) | MVC 입문 — LÖVE2D 없이 콘솔 예제 6개로 배우기 (09·10장 이후 권장) |
 
 ---
 
