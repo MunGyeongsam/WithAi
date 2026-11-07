@@ -3,7 +3,7 @@
 -- 입력·이동·적 패턴·탄막·충돌·렌더·이펙트·상태를 한 파일에 전부 몰아넣었다.
 -- ⚠️ 이 구조를 따라 하지 말 것. 3~4주차에 이걸 MVC로 분해한다.
 --
--- 조작: ←/→ 이동, Space 발사, R 재시작, Esc 종료.
+-- 조작: ←/→ 이동, Space 발사, X 유도 미사일, R 재시작, Esc 종료.
 
 -- 파일 전역 상태 덩어리(모놀리식의 전형). 모든 게 여기 뒤섞여 산다.
 local player
@@ -28,6 +28,8 @@ local bossSpawned = false -- [B1] 보스 1회 등장 플래그
 local PLAYER_SPEED = 320
 local BULLET_SPEED = 520
 local ENEMY_BULLET_SPEED = 240
+local HOMING_SPEED = 440 -- [H1] 유도 미사일 속력
+local HOMING_TURN = 0.08 -- [H1] 유도 선회율(0~1)
 local BOSS_BULLET_SPEED = 180 -- [B1] 보스 방사 탄 속력
 local BOSS_SCORE = 1000 -- [B1] 보스 등장 점수
 
@@ -47,7 +49,7 @@ local function spawnFormation()
 end
 
 local function resetGame()
-  player = { x = 300 - 20, y = 740, w = 40, h = 24, cooldown = 0 }
+  player = { x = 300 - 20, y = 740, w = 40, h = 24, cooldown = 0, missileCd = 0 } -- [H2] 미사일 쿨다운
   bullets = {}
   enemyBullets = {}
   particles = {}
@@ -84,6 +86,28 @@ local function explode(x, y)
   end
   flash = 0.06
   -- love.audio.play(explosionSfx)  -- 사운드도 여기서 바로 재생(결합). 에셋 없어 주석.
+end
+
+-- [H3] 유도 미사일의 목표를 고른다(가장 가까운 적 또는 보스). 로직이 또 길어진다.
+local function nearestTarget(x, y)
+  local tx, ty, best = nil, nil, math.huge
+  for _, e in ipairs(enemies) do
+    if e.alive then
+      local cx, cy = e.x + e.w * 0.5, e.y + e.h * 0.5
+      local d = (cx - x) * (cx - x) + (cy - y) * (cy - y)
+      if d < best then
+        best, tx, ty = d, cx, cy
+      end
+    end
+  end
+  if boss and boss.alive then
+    local cx, cy = boss.x + boss.w * 0.5, boss.y + boss.h * 0.5
+    local d = (cx - x) * (cx - x) + (cy - y) * (cy - y)
+    if d < best then
+      tx, ty = cx, cy
+    end
+  end
+  return tx, ty
 end
 
 -- [B3] 보스를 등장시킨다. 편대와 별개의 새 엔티티/상태가 끼어든다.
@@ -137,15 +161,43 @@ function love.update(dt)
   -- 발사(쿨다운). 입력 해석과 총알 생성이 한 곳에.
   player.cooldown = player.cooldown - dt
   if love.keyboard.isDown("space") and player.cooldown <= 0 then
-    bullets[#bullets + 1] = { x = player.x + player.w * 0.5 - 2, y = player.y, w = 4, h = 12 }
+    -- [H2] 이제 일반 총알도 vx/vy/homing 필드를 가진다(자료구조 전파).
+    bullets[#bullets + 1] =
+      { x = player.x + player.w * 0.5 - 2, y = player.y, w = 4, h = 12, vx = 0, vy = -BULLET_SPEED, homing = false }
     player.cooldown = 0.25
   end
 
-  -- 플레이어 총알 이동 + 화면 밖 제거
+  -- [H2] 유도 미사일 발사(별도 입력/쿨다운)
+  player.missileCd = player.missileCd - dt
+  if love.keyboard.isDown("x") and player.missileCd <= 0 then
+    bullets[#bullets + 1] =
+      { x = player.x + player.w * 0.5 - 3, y = player.y, w = 6, h = 14, vx = 0, vy = -HOMING_SPEED, homing = true }
+    player.missileCd = 0.6
+  end
+
+  -- 플레이어 총알 이동 + 화면 밖 제거 ( [H3] 유도 분기가 이 루프를 오염시킨다 )
   for i = #bullets, 1, -1 do
     local b = bullets[i]
-    b.y = b.y - BULLET_SPEED * dt
-    if b.y + b.h < 0 then
+    if b.homing then
+      local tx, ty = nearestTarget(b.x, b.y)
+      if tx then
+        local dx, dy = tx - b.x, ty - b.y
+        local len = math.sqrt(dx * dx + dy * dy)
+        if len > 0 then
+          local dvx, dvy = dx / len * HOMING_SPEED, dy / len * HOMING_SPEED
+          b.vx = b.vx + (dvx - b.vx) * HOMING_TURN
+          b.vy = b.vy + (dvy - b.vy) * HOMING_TURN
+          -- 속력 유지(정규화)
+          local sl = math.sqrt(b.vx * b.vx + b.vy * b.vy)
+          if sl > 0 then
+            b.vx, b.vy = b.vx / sl * HOMING_SPEED, b.vy / sl * HOMING_SPEED
+          end
+        end
+      end
+    end
+    b.x = b.x + b.vx * dt
+    b.y = b.y + b.vy * dt
+    if b.y + b.h < 0 or b.y > 800 or b.x < -20 or b.x > 620 then
       table.remove(bullets, i)
     end
   end
@@ -313,8 +365,13 @@ function love.draw()
   love.graphics.setColor(0.4, 0.9, 1)
   love.graphics.rectangle("fill", player.x, player.y, player.w, player.h)
 
-  love.graphics.setColor(1, 1, 0.3)
+  -- 총알: [H4] 유도 미사일은 다른 색으로(그리기도 전파)
   for _, b in ipairs(bullets) do
+    if b.homing then
+      love.graphics.setColor(0.4, 1, 0.6)
+    else
+      love.graphics.setColor(1, 1, 0.3)
+    end
     love.graphics.rectangle("fill", b.x, b.y, b.w, b.h)
   end
 
