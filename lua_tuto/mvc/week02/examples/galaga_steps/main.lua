@@ -8,14 +8,34 @@
 -- 파일 전역 상태 덩어리(모놀리식의 전형). 모든 게 여기 뒤섞여 산다.
 local player
 local bullets = {}
+local enemies = {}
+
+local formationDir = 1 -- 적 편대 좌우 이동 방향
 
 -- 매직 넘버가 여기저기 흩어진다. 일부는 여기, 일부는 코드 속에 인라인.
 local PLAYER_SPEED = 320
 local BULLET_SPEED = 520
 
+local function spawnFormation()
+  enemies = {}
+  for row = 0, 3 do
+    for col = 0, 7 do
+      enemies[#enemies + 1] = {
+        x = 60 + col * 60,
+        y = 60 + row * 50,
+        w = 36,
+        h = 28,
+        alive = true,
+      }
+    end
+  end
+end
+
 local function resetGame()
   player = { x = 300 - 20, y = 740, w = 40, h = 24, cooldown = 0 }
   bullets = {}
+  formationDir = 1
+  spawnFormation()
 end
 
 function love.load()
@@ -53,6 +73,26 @@ function love.update(dt)
       table.remove(bullets, i)
     end
   end
+
+  -- 적 편대 이동(좌우로 흔들리다 끝에서 한 칸 내려옴)
+  local minx, maxx = math.huge, -math.huge
+  for _, e in ipairs(enemies) do
+    if e.alive then
+      minx = math.min(minx, e.x)
+      maxx = math.max(maxx, e.x + e.w)
+    end
+  end
+  local dx = formationDir * 40 * dt
+  if maxx + dx > 590 or minx + dx < 10 then
+    formationDir = -formationDir
+    for _, e in ipairs(enemies) do
+      e.y = e.y + 16 -- 한 칸 하강
+    end
+  else
+    for _, e in ipairs(enemies) do
+      e.x = e.x + dx
+    end
+  end
 end
 
 function love.draw()
@@ -62,6 +102,13 @@ function love.draw()
   love.graphics.setColor(1, 1, 0.3)
   for _, b in ipairs(bullets) do
     love.graphics.rectangle("fill", b.x, b.y, b.w, b.h)
+  end
+
+  love.graphics.setColor(1, 0.4, 0.4)
+  for _, e in ipairs(enemies) do
+    if e.alive then
+      love.graphics.rectangle("fill", e.x, e.y, e.w, e.h)
+    end
   end
 end
 
