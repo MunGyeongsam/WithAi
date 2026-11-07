@@ -14,16 +14,22 @@ local particles = {} -- 순수 "보이는 효과"인데 로직 파일에 같이 
 local score = 0
 local lives = 3
 local gameover = false
+local won = false -- [B1] 보스 격파 승리 상태
 
 local formationDir = 1 -- 적 편대 좌우 이동 방향
 local enemyShootTimer = 0
 local screenShake = 0 -- ⚠️ VIEW(연출) 상태가 로직 상태와 한 덩어리
 local flash = 0 -- 적 파괴 시 번쩍임(연출)
 
+local boss = nil -- [B1] 보스 엔티티
+local bossSpawned = false -- [B1] 보스 1회 등장 플래그
+
 -- 매직 넘버가 여기저기 흩어진다. 일부는 여기, 일부는 코드 속에 인라인.
 local PLAYER_SPEED = 320
 local BULLET_SPEED = 520
 local ENEMY_BULLET_SPEED = 240
+local BOSS_BULLET_SPEED = 180 -- [B1] 보스 방사 탄 속력
+local BOSS_SCORE = 1000 -- [B1] 보스 등장 점수
 
 local function spawnFormation()
   enemies = {}
@@ -48,6 +54,9 @@ local function resetGame()
   score = 0
   lives = 3
   gameover = false
+  won = false -- [B2]
+  boss = nil -- [B2]
+  bossSpawned = false -- [B2]
   formationDir = 1
   enemyShootTimer = 0
   screenShake = 0
@@ -75,6 +84,22 @@ local function explode(x, y)
   end
   flash = 0.06
   -- love.audio.play(explosionSfx)  -- 사운드도 여기서 바로 재생(결합). 에셋 없어 주석.
+end
+
+-- [B3] 보스를 등장시킨다. 편대와 별개의 새 엔티티/상태가 끼어든다.
+local function spawnBoss()
+  boss = {
+    x = 240,
+    y = 70,
+    w = 120,
+    h = 60,
+    hp = 40,
+    maxhp = 40,
+    alive = true,
+    dir = 1,
+    shootTimer = 1.0,
+  }
+  bossSpawned = true
 end
 
 function love.load()
@@ -157,16 +182,48 @@ function love.update(dt)
     end
     if #alive > 0 then
       local e = alive[math.random(#alive)]
+      -- [B5] 이제 적 총알도 vx/vy를 가진다(보스 방사탄과 자료구조 통일 → 전파).
       enemyBullets[#enemyBullets + 1] =
-        { x = e.x + e.w * 0.5 - 2, y = e.y + e.h, w = 4, h = 12 }
+        { x = e.x + e.w * 0.5 - 2, y = e.y + e.h, w = 4, h = 12, vx = 0, vy = ENEMY_BULLET_SPEED }
     end
   end
 
-  -- 적 총알 이동 + 화면 밖 제거
+  -- [B3][B4] 보스 등장/이동/발사
+  if not bossSpawned and score >= BOSS_SCORE then
+    spawnBoss()
+  end
+  if boss and boss.alive then
+    boss.x = boss.x + boss.dir * 70 * dt
+    if boss.x < 10 then
+      boss.x, boss.dir = 10, 1
+    elseif boss.x > 590 - boss.w then
+      boss.x, boss.dir = 590 - boss.w, -1
+    end
+    boss.shootTimer = boss.shootTimer - dt
+    if boss.shootTimer <= 0 then
+      boss.shootTimer = 1.2
+      local cx, cy = boss.x + boss.w * 0.5, boss.y + boss.h * 0.5
+      local n = 18 -- [B5] 원형 방사 탄막
+      for k = 0, n - 1 do
+        local a = (k / n) * math.pi * 2
+        enemyBullets[#enemyBullets + 1] = {
+          x = cx,
+          y = cy,
+          w = 6,
+          h = 6,
+          vx = math.cos(a) * BOSS_BULLET_SPEED,
+          vy = math.sin(a) * BOSS_BULLET_SPEED,
+        }
+      end
+    end
+  end
+
+  -- 적 총알 이동 + 화면 밖 제거 ( [B6] vx 적용 + 좌우 화면 밖 제거로 변경됨 )
   for i = #enemyBullets, 1, -1 do
     local b = enemyBullets[i]
-    b.y = b.y + ENEMY_BULLET_SPEED * dt
-    if b.y > 800 then
+    b.x = b.x + b.vx * dt
+    b.y = b.y + b.vy * dt
+    if b.y > 800 or b.y < -20 or b.x < -20 or b.x > 620 then
       table.remove(enemyBullets, i)
     end
   end
@@ -181,6 +238,23 @@ function love.update(dt)
         explode(e.x + e.w * 0.5, e.y + e.h * 0.5) -- ⚠️ 로직이 연출을 직접 호출
         table.remove(bullets, bi)
         break
+      end
+    end
+  end
+
+  -- [B7] 충돌: 플레이어 총알 × 보스 (HP 다중 피격)
+  if boss and boss.alive then
+    for bi = #bullets, 1, -1 do
+      if hit(bullets[bi], boss) then
+        boss.hp = boss.hp - 1
+        explode(bullets[bi].x, bullets[bi].y)
+        table.remove(bullets, bi)
+        if boss.hp <= 0 then
+          boss.alive = false
+          score = score + 2000
+          won = true
+          gameover = true
+        end
       end
     end
   end
@@ -208,7 +282,7 @@ function love.update(dt)
     end
   end
 
-  -- 전멸 시 다음 편대
+  -- 전멸 시 다음 편대 ( [B3] 단, 보스 등장 후엔 편대를 다시 뽑지 않음 )
   local anyAlive = false
   for _, e in ipairs(enemies) do
     if e.alive then
@@ -216,7 +290,7 @@ function love.update(dt)
       break
     end
   end
-  if not anyAlive then
+  if not anyAlive and not bossSpawned then
     spawnFormation()
   end
 end
@@ -251,6 +325,16 @@ function love.draw()
     end
   end
 
+  -- [B8] 보스 + HP 바
+  if boss and boss.alive then
+    love.graphics.setColor(0.9, 0.3, 0.9)
+    love.graphics.rectangle("fill", boss.x, boss.y, boss.w, boss.h)
+    love.graphics.setColor(0.2, 0.2, 0.2)
+    love.graphics.rectangle("fill", 100, 40, 400, 10)
+    love.graphics.setColor(1, 0.2, 0.2)
+    love.graphics.rectangle("fill", 100, 40, 400 * (boss.hp / boss.maxhp), 10)
+  end
+
   love.graphics.setColor(1, 0.6, 0.2)
   for _, b in ipairs(enemyBullets) do
     love.graphics.rectangle("fill", b.x, b.y, b.w, b.h)
@@ -267,7 +351,9 @@ function love.draw()
   love.graphics.print("SCORE " .. score, 10, 10)
   love.graphics.print("LIVES " .. lives, 500, 10)
   if gameover then
-    love.graphics.printf("GAME OVER\nPress R", 0, 380, 600, "center")
+    -- [B9] 승/패 메시지 분기
+    local msg = won and "YOU WIN!\nPress R" or "GAME OVER\nPress R"
+    love.graphics.printf(msg, 0, 380, 600, "center")
   end
 end
 
