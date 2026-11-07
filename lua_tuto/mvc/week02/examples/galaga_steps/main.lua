@@ -9,12 +9,15 @@
 local player
 local bullets = {}
 local enemies = {}
+local enemyBullets = {}
 
 local formationDir = 1 -- 적 편대 좌우 이동 방향
+local enemyShootTimer = 0
 
 -- 매직 넘버가 여기저기 흩어진다. 일부는 여기, 일부는 코드 속에 인라인.
 local PLAYER_SPEED = 320
 local BULLET_SPEED = 520
+local ENEMY_BULLET_SPEED = 240
 
 local function spawnFormation()
   enemies = {}
@@ -34,12 +37,15 @@ end
 local function resetGame()
   player = { x = 300 - 20, y = 740, w = 40, h = 24, cooldown = 0 }
   bullets = {}
+  enemyBullets = {}
   formationDir = 1
+  enemyShootTimer = 0
   spawnFormation()
 end
 
 function love.load()
   love.graphics.setBackgroundColor(0.02, 0.02, 0.06)
+  math.randomseed(os.time()) -- ⚠️ 비결정적 시드. 같은 입력도 결과가 매번 달라짐 → 테스트 불가
   resetGame()
 end
 
@@ -93,6 +99,32 @@ function love.update(dt)
       e.x = e.x + dx
     end
   end
+
+  -- 적 발사(랜덤). 살아있는 적 중 하나를 골라 아래로 쏜다.
+  enemyShootTimer = enemyShootTimer - dt
+  if enemyShootTimer <= 0 then
+    enemyShootTimer = 0.6
+    local alive = {}
+    for _, e in ipairs(enemies) do
+      if e.alive then
+        alive[#alive + 1] = e
+      end
+    end
+    if #alive > 0 then
+      local e = alive[math.random(#alive)]
+      enemyBullets[#enemyBullets + 1] =
+        { x = e.x + e.w * 0.5 - 2, y = e.y + e.h, w = 4, h = 12 }
+    end
+  end
+
+  -- 적 총알 이동 + 화면 밖 제거
+  for i = #enemyBullets, 1, -1 do
+    local b = enemyBullets[i]
+    b.y = b.y + ENEMY_BULLET_SPEED * dt
+    if b.y > 800 then
+      table.remove(enemyBullets, i)
+    end
+  end
 end
 
 function love.draw()
@@ -109,6 +141,11 @@ function love.draw()
     if e.alive then
       love.graphics.rectangle("fill", e.x, e.y, e.w, e.h)
     end
+  end
+
+  love.graphics.setColor(1, 0.6, 0.2)
+  for _, b in ipairs(enemyBullets) do
+    love.graphics.rectangle("fill", b.x, b.y, b.w, b.h)
   end
 end
 
