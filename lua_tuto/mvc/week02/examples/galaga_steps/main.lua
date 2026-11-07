@@ -13,6 +13,7 @@ local enemyBullets = {}
 local particles = {} -- 순수 "보이는 효과"인데 로직 파일에 같이 산다
 local score = 0
 local lives = 3
+local gameover = false
 
 local formationDir = 1 -- 적 편대 좌우 이동 방향
 local enemyShootTimer = 0
@@ -46,6 +47,7 @@ local function resetGame()
   particles = {}
   score = 0
   lives = 3
+  gameover = false
   formationDir = 1
   enemyShootTimer = 0
   screenShake = 0
@@ -83,6 +85,10 @@ end
 
 -- update: 입력·물리·충돌·연출·상태 전부 뒤섞여 있다. dt 를 그대로 적분(고정 스텝 없음).
 function love.update(dt)
+  if gameover then
+    return
+  end
+
   if screenShake > 0 then
     screenShake = screenShake - dt
   end
@@ -185,6 +191,9 @@ function love.update(dt)
       table.remove(enemyBullets, i)
       lives = lives - 1
       screenShake = 0.3 -- ⚠️ 또 연출 상태를 로직에서 직접 건드림
+      if lives <= 0 then
+        gameover = true
+      end
     end
   end
 
@@ -253,10 +262,19 @@ function love.draw()
   end
 
   love.graphics.pop()
+
+  love.graphics.setColor(1, 1, 1)
+  love.graphics.print("SCORE " .. score, 10, 10)
+  love.graphics.print("LIVES " .. lives, 500, 10)
+  if gameover then
+    love.graphics.printf("GAME OVER\nPress R", 0, 380, 600, "center")
+  end
 end
 
 function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
+  elseif key == "r" and gameover then
+    resetGame()
   end
 end
