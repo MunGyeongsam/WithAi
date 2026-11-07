@@ -388,3 +388,7 @@ love lua_tuto/mvc/week07/examples/starter
 | 결과 | R 재도전, V 리플레이, **S 저장**, Enter 타이틀 |
 | 리플레이 | Space 1/4배속, Esc/Enter 타이틀 |
 | 어디서나 | **F3 성능 표시** |
+
+---
+
+> 📎 **선택 심화:** MVC 의 장단점과 단점을 메우는 구조(MVP·MVVM·TEA·ECS·Hexagonal)는 [week08_more](../week08_more/README.md) 에서 같은 게임 여섯 개로 비교한다.
