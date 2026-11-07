@@ -10,6 +10,8 @@ local player
 local bullets = {}
 local enemies = {}
 local enemyBullets = {}
+local score = 0
+local lives = 3
 
 local formationDir = 1 -- 적 편대 좌우 이동 방향
 local enemyShootTimer = 0
@@ -38,9 +40,16 @@ local function resetGame()
   player = { x = 300 - 20, y = 740, w = 40, h = 24, cooldown = 0 }
   bullets = {}
   enemyBullets = {}
+  score = 0
+  lives = 3
   formationDir = 1
   enemyShootTimer = 0
   spawnFormation()
+end
+
+-- 충돌 판정(AABB). 그나마 유일하게 재사용 가능한 순수 함수.
+local function hit(a, b)
+  return a.x < b.x + b.w and b.x < a.x + a.w and a.y < b.y + b.h and b.y < a.y + a.h
 end
 
 function love.load()
@@ -124,6 +133,39 @@ function love.update(dt)
     if b.y > 800 then
       table.remove(enemyBullets, i)
     end
+  end
+
+  -- 충돌: 플레이어 총알 × 적  (판정 + 점수가 한 루프에)
+  for bi = #bullets, 1, -1 do
+    local b = bullets[bi]
+    for _, e in ipairs(enemies) do
+      if e.alive and hit(b, e) then
+        e.alive = false
+        score = score + 100
+        table.remove(bullets, bi)
+        break
+      end
+    end
+  end
+
+  -- 충돌: 적 총알 × 플레이어
+  for i = #enemyBullets, 1, -1 do
+    if hit(enemyBullets[i], player) then
+      table.remove(enemyBullets, i)
+      lives = lives - 1
+    end
+  end
+
+  -- 전멸 시 다음 편대
+  local anyAlive = false
+  for _, e in ipairs(enemies) do
+    if e.alive then
+      anyAlive = true
+      break
+    end
+  end
+  if not anyAlive then
+    spawnFormation()
   end
 end
 
