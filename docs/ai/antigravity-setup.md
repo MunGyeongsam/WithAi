@@ -9,13 +9,15 @@
 Antigravity는 단순한 자동완성 도구가 아니라, 워크스페이스의 흐름과 책임을 추론하고 대화형으로 코드를 설계 및 리팩터링하는 에이전트입니다.
 
 ### 핵심 동작 계층
-1. **프로젝트 루트 지침 (`AGENTS.md` / `.antigravityrules.md`):**
+1. **프로젝트 루트 지침 (`AGENTS.md` / `.agents/rules/project-core.md`):**
    - 개발을 시작할 때 Antigravity가 가장 먼저 읽는 최우선순위 명세입니다.
    - 전역 오염 배제, 모듈 단위 설계, `update/draw` 아키텍처 분리 등의 코딩 표준이 명문화되어 있습니다.
-2. **지능형 하위 규칙 (`.antigravity/rules/`):**
+2. **지능형 하위 규칙 (`.agents/rules/`):**
    - 파일 유형 및 작업 목적에 맞추어 활성화되는 정밀 룰셋입니다.
-3. **특화 스킬 및 플로우 (`.antigravity/skills/` & `.antigravity/workflows/`):**
+3. **특화 스킬 및 플로우 (`.agents/skills/` & `.agents/workflows/`):**
    - 복잡한 리팩터링 및 신규 게임플레이 모듈 스캐폴딩 작업을 위해 정의된 자가 에이전트 전용 프로세스입니다.
+
+> 경로 안내: Antigravity 공식 기본 경로는 `.agents/` 입니다(구버전 `.agent/` 만 하위 호환). 예전 `.antigravity/` 와 `.antigravityrules.md` 는 인식되지 않으므로 `.agents/` 로 옮겼습니다. 참고: https://antigravity.google/docs/rules , https://antigravity.google/docs/skills
 
 ---
 
@@ -69,15 +71,18 @@ Antigravity 통합 개발 환경으로 재편된 디렉토리 트리는 다음�
 
 ```
 WithAi/
-├── .antigravityrules.md         # Antigravity 전역 최우선 지침
-├── .antigravity/
+├── .agents/
 │   ├── rules/
-│   │   └── lua-love2d.md       # LÖVE2D 및 LuaJIT 구체 제약 규칙
+│   │   ├── project-core.md     # Antigravity 전역 최우선 지침 (always_on)
+│   │   ├── lua-love2d.md       # LÖVE2D 및 LuaJIT 구체 제약 규칙
+│   │   └── lua-expert.md       # Lua 언어 전문 규칙
 │   ├── skills/
 │   │   ├── love2d-architect/   # 아키텍처 재설계 및 리팩터링 스킬
-│   │   └── love2d-feature-scaffolding/ # 피처 생성 및 스캐폴딩 스킬
+│   │   ├── love2d-feature-scaffold/ # 피처 생성 및 스캐폴딩 스킬
+│   │   └── lua-expert/         # Lua 언어 전문 스킬
 │   └── workflows/
-│       └── release-check.md    # 릴리스 전 품질 체크리스트 워크플로우
+│       ├── release-check.md    # 릴리스 전 품질 체크리스트 워크플로우
+│       └── prompt-expert.md    # 프롬프트 다듬기 워크플로우
 ├── .vscode/
 │   ├── settings.json           # 언어 서버 및 린트 포맷 통합 설정
 │   └── tasks.json              # 빌드 및 실행 자동화 태스크
