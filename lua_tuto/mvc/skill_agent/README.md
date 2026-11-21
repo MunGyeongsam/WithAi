@@ -7,6 +7,7 @@
 이 폴더 문서:
 - [README.md](./README.md): 개요 (이 문서)
 - [작성_가이드.md](./작성_가이드.md): 규칙, 스킬, 워크플로, 에이전트의 개념, 작성법, 사용 예시 3개씩
+- [사용법_명시적_암시적.md](./사용법_명시적_암시적.md): 키트 항목별 동작 방식, 명시적 호출과 암시적 트리거 예시 3개씩, Antigravity/Gemini 앱 차이
 - [프롬프트_예시집.md](./프롬프트_예시집.md): 나쁜 예 / 좋은 예 10쌍
 - [강사노트.md](./강사노트.md): 학생이 볼 파일 순서, 도구 소개 요점, 예시 활용법 (진행자용)
 - 학생 배포용 통합 가이드 (프롬프트 팁 포함): [../../../docs/ai/prompt-engineering-guide-student.md](../../../docs/ai/prompt-engineering-guide-student.md)
@@ -44,7 +45,19 @@
 
 ## 4. 키트 구성
 
-### 스킬 6개 (Gemini 앱 + Antigravity 공용)
+> 이 키트(`kit/.agents/`)는 저장소 루트 `.agents/` 와 같은 내용으로 유지한다. 한쪽을 고치면 다른 쪽에도 반영하고 zip 을 다시 만든다 (8절).
+
+### 규칙 3개 (Antigravity 전용)
+
+| 규칙 | 트리거 | 내용 |
+|---|---|---|
+| [project-core](./kit/.agents/rules/project-core.md) | `always_on` | 모듈 패턴, update/draw 분리, 결정적 루프, 출력 형식(변경 파일·리스크·검증) |
+| [lua-love2d](./kit/.agents/rules/lua-love2d.md) | `model_decision` | LuaJIT/LÖVE 11 호환, 암묵적 전역 금지, 모듈 경계 |
+| [lua-expert](./kit/.agents/rules/lua-expert.md) | `model_decision` | Lua 5.1 문법, 경계값 처리, 불필요한 할당 줄이기 |
+
+> `project-core` 의 검증 예시는 VS Code task 이름(`Love2D: Run project`)이다. task 가 없는 환경에서는 `love .` 또는 헤드리스 테스트 실행으로 대신한다.
+
+### 스킬 9개 (Gemini 앱 + Antigravity 공용)
 
 | 스킬 | 하는 일 | 관련 과목 |
 |---|---|---|
@@ -54,23 +67,32 @@
 | [headless-test-writer](./kit/.agents/skills/headless-test-writer/SKILL.md) | 창 없이 도는 테스트 작성 | 공통 |
 | [worklog-writer](./kit/.agents/skills/worklog-writer/SKILL.md) | 작업 로그와 인계 메모 작성 | 공통 (로그 채점 핵심) |
 | [prompt-improver](./kit/.agents/skills/prompt-improver/SKILL.md) | 프롬프트를 6요소 기준으로 진단·개선 | 공통 |
+| [lua-expert](./kit/.agents/skills/lua-expert/SKILL.md) | Lua 문법, 테이블, 메타테이블, 모듈, 오류 처리 | 게임시스템설계 |
+| [love2d-architect](./kit/.agents/skills/love2d-architect/SKILL.md) | 모듈 분리, 의존성 정리, 구조 리팩터링 | 공통 |
+| [love2d-feature-scaffold](./kit/.agents/skills/love2d-feature-scaffold/SKILL.md) | update/draw 분리를 지키는 새 기능 골격 | 공통 |
 
-### 에이전트 3개 (Antigravity 전용)
+### 에이전트 6개 (Antigravity 전용)
 
 | 에이전트 | 허용 도구 | 역할 |
 |---|---|---|
 | [planner](./kit/.agents/agents/planner.md) | 읽기만 | 계획과 수정 허용 파일 목록 제시. 수정 불가 |
 | [lua-reviewer](./kit/.agents/agents/lua-reviewer.md) | 읽기만 | Lua 문법·MVC·테스트 기준 리뷰 보고서 |
-| [test-runner](./kit/.agents/agents/test-runner.md) | 읽기 + 명령 실행 | 테스트만 실행하고 결과 요약. 수정 불가 |
+| [test-runner](./kit/.agents/agents/test-runner.md) | 읽기 + 명령 실행 | 테스트만 실행하고 결과 요약. 수정 불가. 서브에이전트 전용 (`mainAgent: false`) |
+| [lua-expert](./kit/.agents/agents/lua-expert.md) | 제한 없음 (수정 가능) | Lua 언어 수준 설계·리팩터링 |
+| [love2d-architect](./kit/.agents/agents/love2d-architect.md) | 제한 없음 (수정 가능) | 모듈 경계·의존성 구조 설계 |
+| [love2d-feature-scaffold](./kit/.agents/agents/love2d-feature-scaffold.md) | 제한 없음 (수정 가능) | 게임플레이 기능 추가·재구성 |
 
-> 설계 의도: **코드를 고칠 수 없는 에이전트**를 둔다. 계획, 리뷰, 실행 결과를 보고 수정 여부를 판단하는 것은 학생 몫이다.
+> 설계 의도: 위 3개는 **코드를 고칠 수 없는 에이전트**다. 계획, 리뷰, 실행 결과를 보고 수정 여부를 판단하는 것은 학생 몫이다. 아래 3개는 코드를 고칠 수 있으므로 프롬프트에 **수정 허용 파일**을 반드시 적는다.
+>
+> 같은 이름(`lua-expert`, `love2d-architect`, `love2d-feature-scaffold`)이 규칙·스킬·에이전트에 함께 있다. 명시적으로 부를 때는 "lua-expert **스킬**로", "lua-expert **에이전트**에게"처럼 종류를 붙인다.
 
-### 워크플로 2개 (Antigravity 전용)
+### 워크플로 3개 (Antigravity 전용)
 
 | 워크플로 | 순서 |
 |---|---|
 | [/start-session](./kit/.agents/workflows/start-session.md) | 인계 메모 → 목표 1개 → 수정 허용 파일 → 되돌리기 지점 커밋 → planner 계획 → 승인 대기 |
 | [/end-session](./kit/.agents/workflows/end-session.md) | test-runner → diff 요약(범위 밖 변경 표시) → lua-reviewer → worklog-writer → 커밋 메시지 제안 |
+| [/prompt-expert](./kit/.agents/workflows/prompt-expert.md) | 요청 요약 → 빠진 목표·제약·출력 형식 찾기 → 확인 질문 → 짧은/상세 추천 프롬프트 |
 
 ## 5. 폴더 구조와 배포 파일
 
@@ -78,12 +100,14 @@
 skill_agent/
 ├── README.md                 # 개요 (이 문서)
 ├── 작성_가이드.md
+├── 사용법_명시적_암시적.md
 ├── 프롬프트_예시집.md
 ├── 강사노트.md
 ├── kit/.agents/              # 원본 (수정은 여기서)
-│   ├── skills/<6개>/SKILL.md
-│   ├── agents/<3개>.md
-│   └── workflows/<2개>.md
+│   ├── rules/<3개>.md
+│   ├── skills/<9개>/SKILL.md
+│   ├── agents/<6개>.md
+│   └── workflows/<3개>.md
 ├── gemini_skills/<스킬>.zip  # Gemini 앱 업로드용 (스킬마다 1개, zip 최상위에 SKILL.md)
 └── antigravity_kit.zip       # 학생 프로젝트 루트에 풀면 .agents/ 가 생김
 ```
@@ -122,7 +146,7 @@ for d in kit/.agents/skills/*/; do n=$(basename "$d"); (cd "$d" && rm -f "../../
 ```
 
 - Windows 에서는 탐색기에서 각 스킬 폴더의 `SKILL.md` 를 선택 → "압축(ZIP) 폴더로 보내기" 로 같은 결과를 만들 수 있다.
-- 저장소 루트의 강사용 자산은 `.agents/` 에 있다 (예전 `.antigravity/` 에서 이전).
+- 저장소 루트의 `.agents/` 는 이 키트와 같은 내용이다 (예전 `.antigravity/` 에서 이전). 키트를 고치면 루트에도 복사한다: `rsync -a --exclude .DS_Store lua_tuto/mvc/skill_agent/kit/.agents/ .agents/` (저장소 루트에서 실행)
 
 ## 참조 링크
 

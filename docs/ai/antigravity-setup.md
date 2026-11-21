@@ -16,8 +16,14 @@ Antigravity는 단순한 자동완성 도구가 아니라, 워크스페이스의
    - 파일 유형 및 작업 목적에 맞추어 활성화되는 정밀 룰셋입니다.
 3. **특화 스킬 및 플로우 (`.agents/skills/` & `.agents/workflows/`):**
    - 복잡한 리팩터링 및 신규 게임플레이 모듈 스캐폴딩 작업을 위해 정의된 자가 에이전트 전용 프로세스입니다.
+4. **커스텀 에이전트 (`.agents/agents/`):**
+   - 역할과 출력 형식이 정해진 전문 에이전트입니다. `/agents` 패널에서 메인 에이전트로 고르거나, 메인 에이전트가 서브에이전트로 위임합니다.
+   - lua-expert, love2d-architect, love2d-feature-scaffold 는 `.github/agents/*.agent.md` (Copilot) 와 본문을 동일하게 유지합니다. `tools` 를 지정하지 않아 메인 에이전트가 권한을 결정합니다.
+   - planner, lua-reviewer, test-runner 는 `tools` 로 읽기(+명령 실행)만 허용한 에이전트입니다.
+   - `.agents/` 에는 기말과제(LÖVE 11.5 + Lua 5.1 + MVC)와 관련된 항목만 둡니다. C 강의(`c-master-instructor`), 벽돌깨기 전용(`game-director` 등), `release-check` 는 `.github/` 에만 있습니다.
+   - 루트 `.agents/` 와 학생 배포용 키트 [skill_agent/kit/.agents](../../lua_tuto/mvc/skill_agent/kit/.agents) 는 같은 내용으로 유지합니다. 동기화와 zip 재생성 방법은 [키트 README](../../lua_tuto/mvc/skill_agent/README.md) 8절을 따릅니다.
 
-> 경로 안내: Antigravity 공식 기본 경로는 `.agents/` 입니다(구버전 `.agent/` 만 하위 호환). 예전 `.antigravity/` 와 `.antigravityrules.md` 는 인식되지 않으므로 `.agents/` 로 옮겼습니다. 참고: https://antigravity.google/docs/rules , https://antigravity.google/docs/skills
+> 경로 안내: Antigravity 공식 기본 경로는 `.agents/` 입니다(구버전 `.agent/` 만 하위 호환). 예전 `.antigravity/` 와 `.antigravityrules.md` 는 인식되지 않으므로 `.agents/` 로 옮겼습니다. 참고: https://antigravity.google/docs/rules , https://antigravity.google/docs/skills , https://antigravity.google/docs/subagents
 
 ---
 
@@ -72,6 +78,13 @@ Antigravity 통합 개발 환경으로 재편된 디렉토리 트리는 다음�
 ```
 WithAi/
 ├── .agents/
+│   ├── agents/                 # 커스텀 에이전트 (메인 선택 또는 서브에이전트 위임)
+│   │   ├── love2d-architect.md # 구조/모듈 경계 설계
+│   │   ├── love2d-feature-scaffold.md # 게임플레이 기능 스캐폴딩
+│   │   ├── lua-expert.md       # Lua 언어 전문
+│   │   ├── planner.md          # 계획 수립 (읽기 전용)
+│   │   ├── lua-reviewer.md     # 코드 리뷰 (읽기 전용)
+│   │   └── test-runner.md      # 테스트 실행 (서브에이전트 전용)
 │   ├── rules/
 │   │   ├── project-core.md     # Antigravity 전역 최우선 지침 (always_on)
 │   │   ├── lua-love2d.md       # LÖVE2D 및 LuaJIT 구체 제약 규칙
@@ -79,10 +92,17 @@ WithAi/
 │   ├── skills/
 │   │   ├── love2d-architect/   # 아키텍처 재설계 및 리팩터링 스킬
 │   │   ├── love2d-feature-scaffold/ # 피처 생성 및 스캐폴딩 스킬
-│   │   └── lua-expert/         # Lua 언어 전문 스킬
+│   │   ├── lua-expert/         # Lua 언어 전문 스킬
+│   │   ├── lua51-guard/        # Lua 5.1/LÖVE 11 함정 점검
+│   │   ├── mvc-boundary/       # MVC 경계 점검
+│   │   ├── game-ai-pattern-coach/ # 적 AI 패턴 코칭
+│   │   ├── headless-test-writer/  # 헤드리스 테스트 작성
+│   │   ├── worklog-writer/     # 작업 로그·인계 메모
+│   │   └── prompt-improver/    # 프롬프트 6요소 진단
 │   └── workflows/
-│       ├── release-check.md    # 릴리스 전 품질 체크리스트 워크플로우
-│       └── prompt-expert.md    # 프롬프트 다듬기 워크플로우
+│       ├── prompt-expert.md    # 프롬프트 다듬기 워크플로우
+│       ├── start-session.md    # 세션 시작 절차
+│       └── end-session.md      # 세션 마무리 절차
 ├── .vscode/
 │   ├── settings.json           # 언어 서버 및 린트 포맷 통합 설정
 │   └── tasks.json              # 빌드 및 실행 자동화 태스크

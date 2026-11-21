@@ -12,6 +12,7 @@
 | 2 | [프롬프트 예시집](../../lua_tuto/mvc/skill_agent/프롬프트_예시집.md) | 나쁜 예 / 좋은 예 10쌍 (과제 작업 순서대로) |
 | 3 | [키트 개요](../../lua_tuto/mvc/skill_agent/README.md) | 스킬·에이전트 키트 구성과 설치 |
 | 4 | [작성 가이드](../../lua_tuto/mvc/skill_agent/작성_가이드.md) | 규칙·스킬·워크플로·에이전트 개념, 작성법, 사용 예시 |
+| 5 | [명시적·암시적 사용법](../../lua_tuto/mvc/skill_agent/사용법_명시적_암시적.md) | 키트 항목이 언제 자동으로 쓰이고 언제 직접 불러야 하는지 |
 
 과제 중 참고: [week04 README](../../lua_tuto/mvc/week04/README.md)(출발 코드), [디자인 패턴 STUDY_GUIDE](../../lua_tuto/design_patterns/STUDY_GUIDE.md), [Lua cheatsheet](../../lua_tuto/cheatsheet.md)
 
@@ -163,6 +164,10 @@ tests/helper.lua (테스트 스타일 참고)
 | 세션 끝 | 스킬 `worklog-writer` |
 | (Antigravity) 세션 시작/끝 | 워크플로 `/start-session`, `/end-session` |
 | (Antigravity) 계획 / 리뷰 / 테스트 | 에이전트 `planner`, `lua-reviewer`, `test-runner` |
+| (Antigravity) 프롬프트를 단계별로 다듬을 때 | 워크플로 `/prompt-expert` |
+| Lua 문법·메타테이블·모듈 설계가 궁금할 때 | 스킬 `lua-expert` |
+| 폴더·모듈 구조를 정리할 때 / 새 기능 골격이 필요할 때 | 스킬 `love2d-architect` / `love2d-feature-scaffold` |
+| (Antigravity) 위 작업을 직접 수정까지 맡길 때 | 에이전트 `lua-expert`, `love2d-architect`, `love2d-feature-scaffold` (수정 가능하므로 **수정 허용 파일** 필수) |
 
 **에이전트(Antigravity) 추가 수칙**
 - 작업 전에 커밋해 둔다. 되돌리기가 쉽다.
