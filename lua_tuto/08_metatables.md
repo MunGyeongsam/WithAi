@@ -281,6 +281,8 @@ A.x = 20
 print(C.x)                -- ?
 ```
 
+> 📝 실습 과제(자동 채점 테스트 포함): [assignments/08_metatables/](assignments/08_metatables/README.md)
+
 ---
 
 [← 이전: 07. 테이블 심화](07_tables_advanced.md) | [다음: 09. OOP 패턴 →](09_oop_patterns.md)
