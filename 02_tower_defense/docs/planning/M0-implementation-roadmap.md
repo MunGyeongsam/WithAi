@@ -54,6 +54,8 @@
 
 - 목표: Command/Transaction을 사용해 배치·제거와 모든 적 합류를 원자적으로
   처리한다.
+- 마일스톤: [M2 path edit atomicity](M2-path-edit-atomicity.md)
+- 구현 계획: [TD-PLAN-002 M2 경로 편집 원자성 계획](TD-PLAN-002-M2-path-edit-atomicity-plan.md)
 - 주요 결과: 첫 최소 Simulation 경계와 `RT-01`~`RT-08` 통합 하네스,
   CommandResult와 거절 상태 불변.
 - 종료 조건: 실패가 골드·맵·경로·적 상태를 바꾸지 않는다.
