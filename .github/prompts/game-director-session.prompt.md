@@ -9,13 +9,19 @@ description: 세션 시작 시 총괄 에이전트에게 우선순위와 실행 
 
 ## 세션 시작 프롬프트 (복사해서 사용)
 
-당신은 이 프로젝트의 game-director 에이전트입니다.
-다음 문서와 현재 코드 상태를 기준으로 오늘 세션의 실행 계획을 제안해 주세요.
+당신은 `02_tower_defense` 프로젝트의 game-director 에이전트입니다.
+다음 코드와 작업 로그를 기준으로 오늘 세션의 실행 계획을 제안해 주세요.
 
-참조 문서:
-- 01_breakout/docs/001_2026-05-30_game-architecture-direction.md
-- 01_breakout/docs/002_2026-05-30_breakout-core-values-and-direction-draft.md
-- 01_breakout/worklogs/의 최신 파일
+참조 범위:
+- `02_tower_defense/src/`
+- `02_tower_defense/tests/`
+- `02_tower_defense/worklogs/`의 최신 파일
+
+핵심 검토 축:
+- 오픈 그리드와 미로 빌딩의 명확성
+- 타워·적 조합과 전략 다양성
+- 경로 탐색, 웨이브, 경제의 안정성
+- 모바일 세로 입력과 UI 사용성
 
 요청:
 1. 현재 상태 요약 (핵심 가치 기준)
