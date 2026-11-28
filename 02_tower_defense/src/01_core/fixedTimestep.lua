@@ -38,4 +38,8 @@ function FixedTimestep:getAlpha()
     return self.accumulator / self.fixedDt
 end
 
+function FixedTimestep:getRenderAlpha()
+    return math.min(math.max(self:getAlpha(), 0), 1)
+end
+
 return FixedTimestep
