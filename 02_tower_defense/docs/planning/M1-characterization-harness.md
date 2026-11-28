@@ -1,6 +1,6 @@
 # 마일스톤 M1 - Characterization Harness
 
-> 상태: 진행 예정
+> 상태: 완료
 > 목표 기간: 구조 이동 전 선행 마일스톤
 > 관련 M0 로드맵: [M0 implementation roadmap](M0-implementation-roadmap.md)
 > 실행 계획: [TD-PLAN-001 M1 characterization 계획](TD-PLAN-001-M1-characterization-plan.md)
@@ -128,19 +128,18 @@ M1은 입력과 표현 로직을 바꾸지 않으므로 전체 LÖVE 실행을 �
 
 M1은 다음 조건이 모두 확인되어야 완료로 기록할 수 있다.
 
-- [ ] 기존 기준선과 새 P0/P1 harness가 정해진 runner에서 모두 통과한다.
-- [ ] P0 입력·runtime·gameplay 순서가 fixture assertion 또는 trace로
+- [x] 기존 기준선과 새 P0/P1 harness가 정해진 runner에서 모두 통과한다.
+- [x] P0 입력·runtime·gameplay 순서가 fixture assertion 또는 trace로
   관찰된다.
-- [ ] P1 domain 정상·실패 계약과 level fingerprint가 관찰된다.
-- [ ] characterization 기대값이 코드에 없는 새 규칙이나 밸런스 결정을
+- [x] P1 domain 정상·실패 계약과 level fingerprint가 관찰된다.
+- [x] characterization 기대값이 코드에 없는 새 규칙이나 밸런스 결정을
   만들지 않는다.
-- [ ] source 변경이 있었다면 변경마다 최소 test seam 목적과 불변 동작을
-  설명할 수 있다.
-- [ ] Lua 5.1/LuaJIT와 LÖVE 11.5 문법 경계를 유지한다.
-- [ ] 전체 LÖVE 실행은 미실행이거나 예외 사유와 최소 실행 결과가 기록된다.
-- [ ] `src/`와 `tests/` 변경의 실제 검증 결과가 구현 worklog에 기록된다.
-- [ ] `git diff --check`가 통과한다.
-- [ ] M2가 사용할 상태 fingerprint와 fixture 계약이 인계 문서에 있다.
+- [x] source 변경이 없으며 M1은 test harness와 runner에만 구현됐다.
+- [x] Lua 5.1/LuaJIT와 LÖVE 11.5 문법 경계를 유지한다.
+- [x] 전체 LÖVE 실행은 미실행 사유와 함께 구현 worklog에 기록된다.
+- [x] `src/`와 `tests/` 변경의 실제 검증 결과가 구현 worklog에 기록된다.
+- [x] `git diff --check`가 통과한다.
+- [x] M2가 사용할 상태 fingerprint와 fixture 계약이 인계 문서에 있다.
 
 ## 위험과 대응
 
@@ -179,7 +178,7 @@ M2~M6의 상세 마일스톤 문서는 각 마일스톤 착수 직전에 별도�
 
 ## 마감 기록
 
-- 완료일: 미정
-- 실제 결과: 진행 예정
-- 이월 항목: M1 종료 시 기록
-- 관련 worklog: M1 구현 세션 종료 시 기록
+- 완료일: 2026-11-28
+- 실제 결과: 14개 harness, 79개 검증 사례가 Lua 5.1과 LuaJIT에서 통과했다.
+- 이월 항목: Wave 10 victory 전이와 M2 경로 편집 원자성
+- 관련 worklog: `013_2026-11-28_session.md`~`017_2026-11-28_session.md`
