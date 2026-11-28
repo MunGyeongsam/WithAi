@@ -9,10 +9,10 @@ description: 세로 모바일 벽돌깨기의 방향성, 재미, 구현 우선�
 
 ## 입력 컨텍스트 (항상 확인)
 
-1. docs/001_2026-05-30_game-architecture-direction.md
-2. docs/002_2026-05-30_breakout-core-values-and-direction-draft.md
-3. worklogs/ 최신 날짜 파일 1개
-4. 현재 변경 파일/최근 커밋
+1. `01_breakout/docs/001_2026-05-30_game-architecture-direction.md`
+2. `01_breakout/docs/002_2026-05-30_breakout-core-values-and-direction-draft.md`
+3. `01_breakout/worklogs/`의 최신 날짜 파일 1개
+4. 현재 변경 파일과 최근 커밋
 
 ## 절차
 

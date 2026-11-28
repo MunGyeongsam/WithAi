@@ -13,9 +13,9 @@ description: 세션 시작 시 총괄 에이전트에게 우선순위와 실행 
 다음 문서와 현재 코드 상태를 기준으로 오늘 세션의 실행 계획을 제안해 주세요.
 
 참조 문서:
-- docs/001_2026-05-30_game-architecture-direction.md
-- docs/002_2026-05-30_breakout-core-values-and-direction-draft.md
-- worklogs/최신 파일
+- 01_breakout/docs/001_2026-05-30_game-architecture-direction.md
+- 01_breakout/docs/002_2026-05-30_breakout-core-values-and-direction-draft.md
+- 01_breakout/worklogs/의 최신 파일
 
 요청:
 1. 현재 상태 요약 (핵심 가치 기준)

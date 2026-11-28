@@ -1,0 +1,11 @@
+# 기말과제 모범 답안: 마감(2026-12-05) 후 공개
+lua_tuto/exams/기말과제_모범답안/
+
+# macOS metadata
+.DS_Store
+**/.DS_Store
+
+# Copilot is the repository's active AI configuration source.
+/.agents/
+/.windsurf/
+/.windsurfrules.md

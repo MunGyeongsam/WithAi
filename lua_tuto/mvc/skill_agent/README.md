@@ -45,7 +45,7 @@
 
 ## 4. 키트 구성
 
-> 이 키트(`kit/.agents/`)는 저장소 루트 `.agents/` 와 같은 내용으로 유지한다. 한쪽을 고치면 다른 쪽에도 반영하고 zip 을 다시 만든다 (8절).
+> 이 키트(`kit/.agents/`)는 학생 배포와 Antigravity 수업용 원본이다. 저장소 루트의 활성 개발 설정은 Copilot 전용 `.github/`이며, 이 키트와 동기화하지 않는다.
 
 ### 규칙 3개 (Antigravity 전용)
 
@@ -146,7 +146,7 @@ for d in kit/.agents/skills/*/; do n=$(basename "$d"); (cd "$d" && rm -f "../../
 ```
 
 - Windows 에서는 탐색기에서 각 스킬 폴더의 `SKILL.md` 를 선택 → "압축(ZIP) 폴더로 보내기" 로 같은 결과를 만들 수 있다.
-- 저장소 루트의 `.agents/` 는 이 키트와 같은 내용이다 (예전 `.antigravity/` 에서 이전). 키트를 고치면 루트에도 복사한다: `rsync -a --exclude .DS_Store lua_tuto/mvc/skill_agent/kit/.agents/ .agents/` (저장소 루트에서 실행)
+- Copilot 설정은 루트 `.github/`에서 별도로 관리한다. 교육용 `kit/.agents/` 변경을 `.github/`에 자동으로 복사하지 않는다.
 
 ## 참조 링크
 

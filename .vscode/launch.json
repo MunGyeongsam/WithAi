@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Love2D: Run project (F5)",
+            "name": "Love2D: Run Breakout (F5)",
             "type": "node",
             "request": "launch",
             "preLaunchTask": "Run run.sh",

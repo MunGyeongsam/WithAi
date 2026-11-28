@@ -1,6 +1,6 @@
 # AI 사용 가이드
 
-이 문서는 이 저장소에서 AI를 효율적으로 쓰기 위한 기준을 정리합니다. 목표는 토큰을 아끼면서도, Copilot / Windsurf / Antigravity에서 같은 판단 기준으로 에이전트와 스킬을 고르는 것입니다.
+이 문서는 이 저장소에서 Copilot을 효율적으로 쓰기 위한 기준을 정리합니다. 목표는 토큰을 아끼고 중복 설정 없이 에이전트, 스킬, 프롬프트를 고르는 것입니다.
 
 ---
 
@@ -37,25 +37,19 @@
 
 ### Copilot
 
-- `prompt-expert`로 요청을 먼저 다듬는다.
+- `prompt-improver`로 요청을 먼저 다듬는다.
 - `lua-expert`는 Lua 문법, 테이블, 메타테이블, 성능, 오류 처리에 사용한다.
 - `love2d-architect`는 구조, 의존성, 모듈 경계에 사용한다.
 - `love2d-feature-scaffold`는 기능 추가, 상태 분기, update/draw 분리에 사용한다.
 - `release-check`는 변경 후 품질 점검에 사용한다.
 
-### Windsurf
+Copilot 구성의 역할은 다음과 같다.
 
-- `rules`는 항상 필요한 제약을 담는다.
-- `skills`는 반복되는 다단계 작업에 사용한다.
-- `workflows`는 `/workflow-name`처럼 수동 실행형 절차에 사용한다.
-- 문서가 길어질수록 “무엇이 자동 적용되는지”와 “무엇을 직접 호출해야 하는지”를 분리한다.
-
-### Antigravity
-
-- `rules`는 핵심 코딩 기준을 담는다.
-- `skills`는 구조 개선, 기능 스캐폴딩, 점검 같은 작업에 사용한다.
-- `workflows`는 점검, 릴리스, 프롬프트 정리처럼 반복되는 절차에 사용한다.
-- Windows 예시가 있더라도, 공통 안내는 task 기반으로 먼저 설명한다.
+- `.github/copilot-instructions.md`: 항상 적용되는 공통 기준
+- `.github/instructions`: Lua 파일에 자동 적용되는 언어 및 LÖVE2D 규칙
+- `.github/skills`: 작업에 따라 선택되는 반복 절차
+- `.github/agents`: 계획, 리뷰, 구현, 교육처럼 역할이 다른 작업
+- `.github/prompts`: 세션 시작, 종료, 프롬프트 개선 같은 직접 호출 절차
 
 ---
 
@@ -71,13 +65,13 @@
 
 ### macOS / Linux 학생
 
-- 실행은 `run.sh` 또는 `Love2D: Run project` task를 우선한다.
+- 실행은 `run.sh` 또는 `Love2D: Run Breakout` task를 우선한다.
 - Lua 단위 확인은 `Lua: Run current file`을 우선한다.
 - 브라우저, 터미널, 에디터가 섞여 있어도 task 이름은 공통으로 유지한다.
 
 ### Windows 학생
 
-- 실행은 `run.bat` 또는 `Love2D: Run project` task를 우선한다.
+- 실행은 `run.bat` 또는 `Love2D: Run Breakout` task를 우선한다.
 - 로컬 런타임이 필요한 경우 저장소 포함 바이너리를 보조 경로로 쓴다.
 - F5는 가능하면 보조 경로로만 쓰고, task를 기본 경로로 둔다.
 
@@ -85,7 +79,7 @@
 
 ## 4. 어떤 도구를 먼저 쓸지
 
-### 먼저 `prompt-expert`
+### 먼저 `prompt-improver`
 
 - 요청이 길고 막연할 때
 - 여러 제약이 섞여 있을 때
@@ -117,7 +111,7 @@
 
 ## 5. 추천 작업 흐름
 
-1. 사용자가 할 일을 `prompt-expert`로 정리한다.
+1. 사용자가 할 일을 `prompt-improver`로 정리한다.
 2. Lua 자체 문제면 `lua-expert`로 깊게 들어간다.
 3. 구조 문제면 `love2d-architect`로 재설계한다.
 4. 기능 추가면 `love2d-feature-scaffold`로 구현한다.
@@ -131,7 +125,7 @@
 
 - 목표: 입력 처리와 렌더링 분리
 - 도구: `love2d-feature-scaffold`
-- 검증: 하네스 우선 + 필요 시 `Love2D: Run project` 1회
+- 검증: 하네스 우선 + 필요 시 `Love2D: Run Breakout` 1회
 
 ### 예시 2: Lua 모듈 에러 수정
 
@@ -142,10 +136,10 @@
 ### 예시 3: 복잡한 요청을 짧게 바꾸기
 
 - 목표: AI가 바로 수행 가능한 형태로 요청 재작성
-- 도구: `prompt-expert`
+- 도구: `prompt-improver`
 
 ---
 
 ## 7. 한 줄 요약
 
-작은 요청은 짧게, 복잡한 요청은 먼저 정리하고, 도구는 역할별로 나눠 쓰는 것이 가장 효율적이다.
+작은 요청은 짧게, 복잡한 요청은 먼저 정리하고, Copilot의 skill과 agent는 역할별로 나눠 쓰는 것이 가장 효율적이다.

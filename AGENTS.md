@@ -13,7 +13,9 @@
 ## 검증
 
 - Lua 파일 실행: task "Lua: Run current file"
-- Love2D 앱 실행: task "Love2D: Run project"
+- 벽돌깨기 실행: task "Love2D: Run Breakout"
+- 타워 디펜스 실행: task "Love2D: Run Tower Defense"
+- 현재 테스트 실행: task "Lua: Run current test"
 - 플랫폼에 따라 task "Run run.sh" 또는 "Run run.bat"를 사용할 수 있다.
 - 대체 실행 경로가 필요하면 학생 환경에 맞는 명령을 별도로 안내한다.
 - 프로젝트 도구가 있으면 포맷/린트 규칙 일관성을 유지한다
