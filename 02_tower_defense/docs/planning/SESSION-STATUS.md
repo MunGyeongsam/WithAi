@@ -2,7 +2,7 @@
 
 > 상태 문서 버전: 1
 > 최종 갱신: 2026-11-28
-> 기준 worklog: [008_2026-11-28_session.md](../../worklogs/008_2026-11-28_session.md)
+> 기준 worklog: [009_2026-11-28_session.md](../../worklogs/009_2026-11-28_session.md)
 > 관리 상태: 운영 중
 
 ## 목적
@@ -29,7 +29,10 @@
 | TD-OPS-001 | 세션 인계 체계 구축 | 완료 | P0 | 없음 | 현재 문서, `006_2026-11-28_session.md` | 다음 세션에서 절차를 실제 적용한다. |
 | TD-001 | 이동 중 실시간 경로 편집 규칙 | 완료 | P1 | 운영 문서 준비 완료 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `007_2026-11-28_session.md` | 구현 단계에서 `RT-01`~`RT-08`을 통합 하네스로 연결한다. |
 | TD-002 | 경로 편집·판매 경제 정책 | 완료 | P1 | TD-001의 허용 편집 동작 확정 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `008_2026-11-28_session.md` | `EC-01`~`EC-08`을 구현 통합 하네스로 연결한다. |
-| TD-003 | 레벨 1~3 웨이브 매트릭스 | 대기 | P1 | TD-001, TD-002의 규칙 검토 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md) | 6~8개/레벨 가설 안에서 위협 순서를 검증 가능하게 작성한다. |
+| TD-003 | 레벨 1~3 웨이브 매트릭스 | 완료 | P1 | TD-001, TD-002의 규칙 검토 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `009_2026-11-28_session.md` | 확정한 6/7/8개 학습 순서를 레벨별 데이터와 하네스로 구현한다. |
+| TD-ARCH-001 | 게임플레이 아키텍트와 패턴 선택 | 진행 중 | P0 | TD-001~TD-003 정책 정리 완료 | [ADR-001](../architecture/001-gameplay-architecture-review.md), [작업 계획](TD-ARCH-001-work-plan.md) | A/B/C 선택 게이트와 상태 소유권 검토 후 구현 경계 확정 |
+| TD-PLAN-001 | 구현 마일스톤·작업 분해 | 대기 | P0 | TD-ARCH-001 승인 | [M0 로드맵](M0-implementation-roadmap.md) | 승인된 ADR에 맞춰 M1~M6 작업 계획과 선행 조건 연결 |
+| TD-004 | 레벨별 웨이브 데이터와 검증 | 대기 | P1 | TD-PLAN-001 완료 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `009_2026-11-28_session.md` | 확정된 데이터·실행 경계를 따라 6/7/8웨이브를 구현 |
 
 ### 상태 정의
 
@@ -45,13 +48,15 @@
 
 ## 다음 세션
 
-- 우선 작업: `TD-003`
-- 작업 형태: 레벨 1~3 웨이브 매트릭스 문서/GDD 보강
-- 현재 차단 요소: 없음
-- 시작 프롬프트 원본: [008_2026-11-28_session.md](../../worklogs/008_2026-11-28_session.md)의
+- 우선 작업: `TD-ARCH-001`
+- 작업 형태: 구현 전 전체 게임 아키텍처·디자인 패턴·모듈 경계 검토
+- 현재 차단 요소: A/B/C 아키텍처 선택은 사용자 검토 전
+- 시작 프롬프트 원본: [009_2026-11-28_session.md](../../worklogs/009_2026-11-28_session.md)의
   `다음 세션 프롬프트`
-- 예상 수정 범위: `02_tower_defense/docs/`와 새 worklog
-- 기본 제외 범위: `02_tower_defense/src/`, `02_tower_defense/tests/`
+- 예상 수정 범위: `02_tower_defense/docs/architecture/`,
+  `02_tower_defense/docs/planning/`, 상태 문서와 새 worklog
+- 기본 제외 범위: `02_tower_defense/src/`, `02_tower_defense/tests/`,
+  밸런스 수치와 기능 구현
 
 ## start-session 절차
 

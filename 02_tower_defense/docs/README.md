@@ -51,8 +51,16 @@ docs/
 
 ## 기존 문서
 
+- [타워 디펜스 개발 용어집](glossary.md):
+  ADR, MVC, 패턴, 아키텍처, 테스트, Lua/LÖVE 용어의 정의와 프로젝트 적용 예
 - [Copilot/GitHub 운영 자산 사용 가이드](copilot-github-usage-guide.md):
   이 프로젝트의 Agent, Skill, Prompt 선택과 세션 운영 참조
+- [게임플레이 아키텍처 검토](architecture/001-gameplay-architecture-review.md):
+  구현 전 MVC, 상태 소유권, 원자적 거래, 데이터/팩토리 선택안
+- [M0 구현 로드맵](planning/M0-implementation-roadmap.md):
+  아키텍처 확정부터 밸런스·릴리스 검증까지의 마일스톤과 선행 조건
+- [TD-ARCH-001 작업 계획](planning/TD-ARCH-001-work-plan.md):
+  첫 아키텍처 검토 세션의 범위와 완료 기준
 
 ## 작성 규칙
 
