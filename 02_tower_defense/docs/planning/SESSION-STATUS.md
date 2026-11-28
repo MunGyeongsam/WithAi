@@ -2,7 +2,7 @@
 
 > 상태 문서 버전: 1
 > 최종 갱신: 2026-11-28
-> 기준 worklog: [010_2026-11-28_session.md](../../worklogs/010_2026-11-28_session.md)
+> 기준 worklog: [011_2026-11-28_session.md](../../worklogs/011_2026-11-28_session.md)
 > 관리 상태: 운영 중
 
 ## 목적
@@ -31,8 +31,9 @@
 | TD-002 | 경로 편집·판매 경제 정책 | 완료 | P1 | TD-001의 허용 편집 동작 확정 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `008_2026-11-28_session.md` | `EC-01`~`EC-08`을 구현 통합 하네스로 연결한다. |
 | TD-003 | 레벨 1~3 웨이브 매트릭스 | 완료 | P1 | TD-001, TD-002의 규칙 검토 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `009_2026-11-28_session.md` | 확정한 6/7/8개 학습 순서를 레벨별 데이터와 하네스로 구현한다. |
 | TD-ARCH-001 | 게임플레이 아키텍트와 패턴 선택 | 완료 | P0 | TD-001~TD-003 정책 정리 완료 | [ADR-001](../architecture/001-gameplay-architecture-review.md), [상세 설계](../architecture/002-deterministic-simulation-command-architecture.md) | 수락된 결정에 따라 M1 characterization 계획을 작성한다. |
-| TD-PLAN-001 | 구현 마일스톤·작업 분해 | 대기 | P0 | TD-ARCH-001 승인 | [M0 로드맵](M0-implementation-roadmap.md) | 다음 세션 시작 시 `진행 중`으로 바꾸고 M1 characterization harness의 파일·행동 계약·검증을 구체화 |
-| TD-004 | 레벨별 웨이브 데이터와 검증 | 대기 | P1 | TD-PLAN-001 완료 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `009_2026-11-28_session.md` | 확정된 데이터·실행 경계를 따라 6/7/8웨이브를 구현 |
+| TD-PLAN-001 | 구현 마일스톤·작업 분해 | 완료 | P0 | TD-ARCH-001 승인 | [M1 characterization 계획](TD-PLAN-001-M1-characterization-plan.md) | 다음 구현 세션에서 `TD-M1-001`을 실행한다. |
+| TD-M1-001 | M1 characterization harness 구현 | 대기 | P0 | TD-PLAN-001 완료 | [M1 characterization 계획](TD-PLAN-001-M1-characterization-plan.md) | Core/Input → Gameplay update → Domain gaps → runner 순으로 하네스를 추가한다. |
+| TD-004 | 레벨별 웨이브 데이터와 검증 | 대기 | P1 | M1~M3 완료 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `009_2026-11-28_session.md` | 확정된 데이터·실행 경계를 따라 6/7/8웨이브를 구현 |
 
 ### 상태 정의
 
@@ -48,14 +49,14 @@
 
 ## 다음 세션
 
-- 우선 작업: `TD-PLAN-001`
-- 작업 형태: 수락된 아키텍처를 기반으로 M1 characterization harness 작업 분해
+- 우선 작업: `TD-M1-001`
+- 작업 형태: 기존 동작을 바꾸지 않는 M1 characterization harness 구현
 - 현재 차단 요소: 없음
-- 시작 프롬프트 원본: [010_2026-11-28_session.md](../../worklogs/010_2026-11-28_session.md)의
+- 시작 프롬프트 원본: [011_2026-11-28_session.md](../../worklogs/011_2026-11-28_session.md)의
   `다음 세션 프롬프트`
-- 예상 수정 범위: `02_tower_defense/docs/planning/`, 상태 문서와 새 worklog
-- 기본 제외 범위: `02_tower_defense/src/`, `02_tower_defense/tests/`,
-  밸런스 수치와 기능 구현; 파일 목록은 M1 계획에서만 결정한다.
+- 예상 수정 범위: `02_tower_defense/tests/` 및 꼭 필요한 최소 test seam
+  `02_tower_defense/src/`, 상태 문서와 새 worklog
+- 기본 제외 범위: 밸런스 수치, 기능·UI 동작, 아키텍처 대규모 재작성
 
 ## start-session 절차
 

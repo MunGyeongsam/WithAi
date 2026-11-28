@@ -63,6 +63,8 @@ docs/
   아키텍처 확정부터 밸런스·릴리스 검증까지의 마일스톤과 선행 조건
 - [TD-ARCH-001 작업 계획](planning/TD-ARCH-001-work-plan.md):
   첫 아키텍처 검토 세션의 범위와 완료 기준
+- [TD-PLAN-001 M1 characterization 계획](planning/TD-PLAN-001-M1-characterization-plan.md):
+  기존 동작의 하네스 기준선, 파일별 M1 구현 범위와 검증 순서
 
 ## 작성 규칙
 

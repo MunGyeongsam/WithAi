@@ -45,6 +45,7 @@
 - 목표: 현재 플레이 동작을 수정 없이 테스트 가능한 계약으로 보호한다.
 - 주요 결과: Model 후보 경계, scene orchestration 기준선, 기본 웨이브/전투/경제
   하네스 통과.
+- 구현 계획: [TD-PLAN-001 M1 characterization 계획](TD-PLAN-001-M1-characterization-plan.md)
 - 종료 조건: 현 구현의 정상·실패 동작이 문서화되고 주요 회귀 하네스가 녹색이다.
 - 선행 조건: ADR-001 구조 검토 승인.
 
@@ -128,5 +129,5 @@
 - [x] 수락 구조:
   결정적 Simulation Core + 원자적 Command/Transaction + 최소 MVC +
   제한적 Layered/Hexagonal 경계 + ViewData/Render Event
-- [ ] 첫 구현 마일스톤으로 M1 characterization harness 작업 계획을 승인한다.
+- [x] 첫 구현 마일스톤으로 M1 characterization harness 작업 계획을 승인한다.
 - [x] M4 이전에 `TD-004` 웨이브 구현을 시작하지 않는 순서를 승인한다.
