@@ -61,6 +61,8 @@ docs/
   수락된 게임플레이 아키텍처의 계층, 계약, 원자적 거래, 결정성, 전환과 검증 기준
 - [M0 구현 로드맵](planning/M0-implementation-roadmap.md):
   아키텍처 확정부터 밸런스·릴리스 검증까지의 마일스톤과 선행 조건
+- [M1 characterization harness](planning/M1-characterization-harness.md):
+  현재 플레이 동작 보호의 범위, P0/P1 검증 대상과 관찰 가능한 종료 조건
 - [TD-ARCH-001 작업 계획](planning/TD-ARCH-001-work-plan.md):
   첫 아키텍처 검토 세션의 범위와 완료 기준
 - [TD-PLAN-001 M1 characterization 계획](planning/TD-PLAN-001-M1-characterization-plan.md):

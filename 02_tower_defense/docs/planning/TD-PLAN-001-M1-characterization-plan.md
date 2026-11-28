@@ -2,7 +2,8 @@
 
 > 상태: 확정
 > 작업 ID: TD-PLAN-001
-> 관련 마일스톤: [M0 implementation roadmap](M0-implementation-roadmap.md)의 M1
+> 관련 마일스톤: [M1 characterization harness](M1-characterization-harness.md)
+> 전체 순서: [M0 implementation roadmap](M0-implementation-roadmap.md)
 > 관련 설계:
 > [ADR-001](../architecture/001-gameplay-architecture-review.md),
 > [결정적 Simulation Core + Command 아키텍처](../architecture/002-deterministic-simulation-command-architecture.md)
@@ -12,6 +13,11 @@
 
 M2에서 구조를 이동하기 전에 현재 플레이 동작을 헤드리스 characterization
 harness로 보호할 M1 구현 순서와 계약을 정한다.
+
+이 문서는 M1 마일스톤의 범위·종료 게이트를 정의하지 않는다. 그 역할은
+[M1 characterization harness](M1-characterization-harness.md)가 갖는다.
+TD-PLAN-001은 현재 M1 구현 세션에서 사용할 실행 순서, 파일 후보, 세부
+계약과 검증 명령을 정한다.
 
 이 계획은 구조·수치 변경의 실행 계획을 만들지 않는다. 다음 구현 세션은
 현재 동작을 관찰 가능한 테스트로 기록하고, 꼭 필요한 최소 테스트 훅만

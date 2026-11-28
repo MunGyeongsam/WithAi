@@ -43,6 +43,7 @@
 ### M1 - 경계와 characterization harness
 
 - 목표: 현재 플레이 동작을 수정 없이 테스트 가능한 계약으로 보호한다.
+- 마일스톤: [M1 characterization harness](M1-characterization-harness.md)
 - 주요 결과: Model 후보 경계, scene orchestration 기준선, 기본 웨이브/전투/경제
   하네스 통과.
 - 구현 계획: [TD-PLAN-001 M1 characterization 계획](TD-PLAN-001-M1-characterization-plan.md)
