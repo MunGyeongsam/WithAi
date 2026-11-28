@@ -1,9 +1,10 @@
 # 마일스톤 M0 - 구현 아키텍처 확정과 단계 로드맵
 
-> 상태: 초안
+> 상태: 수락
 > 목표 기간: 구현 시작 전 필요한 세션
 > 관련 GDD: [001_2026-11-28_tower-defense-gdd.md](../design/001_2026-11-28_tower-defense-gdd.md)
 > 관련 ADR: [001-gameplay-architecture-review.md](../architecture/001-gameplay-architecture-review.md)
+> 상세 설계: [002-deterministic-simulation-command-architecture.md](../architecture/002-deterministic-simulation-command-architecture.md)
 > 후속 마일스톤: M1~M6
 
 ## 목표
@@ -51,7 +52,8 @@
 
 - 목표: Command/Transaction을 사용해 배치·제거와 모든 적 합류를 원자적으로
   처리한다.
-- 주요 결과: `RT-01`~`RT-08` 통합 하네스와 거절 상태 불변.
+- 주요 결과: 첫 최소 Simulation 경계와 `RT-01`~`RT-08` 통합 하네스,
+  CommandResult와 거절 상태 불변.
 - 종료 조건: 실패가 골드·맵·경로·적 상태를 바꾸지 않는다.
 - 전체 실행: 입력 미리보기와 시각적 합류가 필요할 때만 최소 실행.
 
@@ -91,8 +93,8 @@
 | 실시간 경로 규칙 | 준비됨 | `TD-001` 정책과 `RT-*` 사례 |
 | 경제·판매 정책 | 준비됨 | `TD-002` 정책과 `EC-*` 사례 |
 | 레벨 웨이브 역할 | 준비됨 | `TD-003` 6/7/8웨이브 매트릭스 |
-| 아키텍처 선택 | 미정 | 사용자 검토 후 ADR-001 수락 |
-| 구현 작업 계획 | 미정 | ADR-001 후 각 마일스톤 작업 계획 작성 |
+| 아키텍처 선택 | 준비됨 | ADR-001 수락 및 상세 설계 문서 작성 |
+| 구현 작업 계획 | 다음 작업 | 수락된 ADR에 따라 M1 작업 계획 작성 |
 
 ## 작업 규칙
 
@@ -122,6 +124,9 @@
 
 ## 승인 질문
 
-- [ ] A/B/C 선택지와 선택 게이트를 검토해 기본 아키텍처를 선택하는가?
-- [ ] 첫 구현 마일스톤으로 M1 characterization harness를 승인하는가?
-- [ ] M4 이전에 `TD-004` 웨이브 구현을 시작하지 않는 순서를 승인하는가?
+- [x] A/B/C 및 추가 선택지를 검토해 기본 아키텍처를 선택했다.
+- [x] 수락 구조:
+  결정적 Simulation Core + 원자적 Command/Transaction + 최소 MVC +
+  제한적 Layered/Hexagonal 경계 + ViewData/Render Event
+- [ ] 첫 구현 마일스톤으로 M1 characterization harness 작업 계획을 승인한다.
+- [x] M4 이전에 `TD-004` 웨이브 구현을 시작하지 않는 순서를 승인한다.

@@ -57,6 +57,8 @@ docs/
   이 프로젝트의 Agent, Skill, Prompt 선택과 세션 운영 참조
 - [게임플레이 아키텍처 검토](architecture/001-gameplay-architecture-review.md):
   구현 전 MVC, 상태 소유권, 원자적 거래, 데이터/팩토리 선택안
+- [결정적 Simulation Core + Command 아키텍처](architecture/002-deterministic-simulation-command-architecture.md):
+  수락된 게임플레이 아키텍처의 계층, 계약, 원자적 거래, 결정성, 전환과 검증 기준
 - [M0 구현 로드맵](planning/M0-implementation-roadmap.md):
   아키텍처 확정부터 밸런스·릴리스 검증까지의 마일스톤과 선행 조건
 - [TD-ARCH-001 작업 계획](planning/TD-ARCH-001-work-plan.md):

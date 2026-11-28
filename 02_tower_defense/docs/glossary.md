@@ -7,8 +7,10 @@
 
 - 약어는 처음 등장할 때 전체 영어 단어와 한국어 뜻을 함께 표기한다.
 - 용어마다 정의뿐 아니라 이 프로젝트에서의 적용 예와 오해하기 쉬운 점을 적는다.
-- “사용한다”는 말은 확정된 아키텍처를 뜻하지 않는다. 현재 결정 상태는
-  [ADR-001](architecture/001-gameplay-architecture-review.md)을 따른다.
+- 현재 수락된 아키텍처는
+  [ADR-001](architecture/001-gameplay-architecture-review.md)과
+  [결정적 Simulation Core + Command 아키텍처](architecture/002-deterministic-simulation-command-architecture.md)를
+  따른다.
 - 관련 문서의 줄이나 파일명은 구현 과정에서 바뀔 수 있으므로, 개념을 먼저
   이해하고 실제 파일은 세션 상태와 코드를 확인한다.
 
@@ -26,8 +28,9 @@ ADR은 단순 설계 설명서가 아니다. 선택하지 않은 대안과 그 �
 나중에 같은 논의를 처음부터 반복하지 않게 한다.
 
 이 프로젝트의 [ADR-001](architecture/001-gameplay-architecture-review.md)은
-현재 `검토 중`이다. 기본안이 있어도 상태가 `수락`이 되기 전에는 구현 승인을
-뜻하지 않는다.
+결정적 Simulation Core, 원자적 Command/Transaction, 최소 MVC와 제한적
+Layered/Hexagonal 경계를 수락한 상태다. 구현 계약은 후속 상세 설계 문서를
+따른다.
 
 ### GDD — Game Design Document
 
@@ -128,8 +131,9 @@ ADR은 주로 결정과 근거를 남기고, RFC는 결정을 앞둔 토론 자�
 셀을 탭했다”는 입력 사실을 “벽 후보 생성”, “판매 확정”, “웨이브 시작” 같은
 의미 있는 명령으로 바꾼다.
 
-현재 모델 코드가 Controller를 갖추지 않았다는 뜻은 아니다. 기존 Scene의
-일부 입력·조정 책임을 별도 경계로 옮길지 검토 중이다.
+현재 프로토타입의 `InputAdapter`와 Scene이 Controller의 일부 역할을 수행한다.
+수락된 구조에서는 입력 의미 해석과 화면 전환을 Controller/Scene 경계로
+점진적으로 옮기되, 코드 이동은 구현 마일스톤에서 수행한다.
 
 ### Scene
 
@@ -230,6 +234,50 @@ FixedTimestep, TitleScene 등의 시작 객체를 조립한다.
 
 트랜잭션의 핵심은 단순 호출 순서가 아니라 **실패 시 부분 적용을 허용하지 않는
 것**이다.
+
+### Simulation Core
+
+**게임 시뮬레이션 핵심**
+
+게임 상태와 규칙을 입력 장치, LÖVE 렌더링, 사운드와 분리해 실행하는 순수
+도메인 계층이다. 고정 타임스텝마다 Command를 처리하고, 웨이브·이동·전투·경제·
+승패를 갱신한다.
+
+이 프로젝트에서 Simulation Core는 `GameState`, `GameSimulation`,
+`CommandProcessor`, Domain System을 포함한다. 같은 초기 상태와 같은 Command
+순서, 같은 fixed timestep이면 같은 최종 상태가 나온다.
+
+### ViewData
+
+**화면용 조회 데이터**
+
+View가 렌더링하는 데 필요한 읽기 전용 데이터 묶음이다. 상태 변경 API가 아니라
+화면 표현용 조회 계약이므로, HUD나 Renderer가 ViewData를 통해 골드나 적을
+직접 수정하지 않는다.
+
+전체 `GameState`를 매 프레임 복사해야 한다는 뜻은 아니다. 초기 구현에서는
+읽기 전용 참조처럼 사용하되, View가 상태를 변경하지 않는다는 계약을 우선한다.
+
+### Render Event
+
+**렌더 이벤트 / 표현 이벤트**
+
+Simulation이 이미 만든 상태 변화나 결과를 View와 효과 계층에 알리는 순서 있는
+사실이다. 예를 들어 `TOWER_FIRED`, `COMMAND_REJECTED`, `ENEMY_DIED`가 있다.
+
+Render Event는 게임 상태를 변경하는 요청이 아니라 시각·청각 표현용 출력이다.
+전역 이벤트 버스를 의미하지 않으며, Simulation이 같은 tick에서 생성한 이벤트
+목록을 명시적으로 반환하거나 전달해 처리한다.
+
+### CommandResult
+
+**명령 처리 결과**
+
+Command 실행이 수락되었는지, 거절되었다면 어떤 코드 때문인지, 상태 revision과
+Render Event가 무엇인지 반환하는 계약이다.
+
+`false`나 `nil`만 반환하지 않고 `PATH_BLOCKED`, `INSUFFICIENT_GOLD`,
+`NO_SAFE_JOIN` 같은 원인을 포함해야 실패 피드백과 헤드리스 검증을 할 수 있다.
 
 ### Atomicity
 

@@ -1,8 +1,8 @@
 # ADR-001: 게임플레이 아키텍처와 설계 패턴 선택
 
-> 상태: 검토 중
+> 상태: 수락
 > 날짜: 2026-11-28
-> 결정자: 사용자 검토 필요
+> 결정자: 사용자 승인
 > 관련 GDD/계획: [GDD](../design/001_2026-11-28_tower-defense-gdd.md),
 > [구현 로드맵](../planning/M0-implementation-roadmap.md)
 > 대체 문서: 없음
@@ -94,13 +94,28 @@
 - **C를 선택할 수 있는 조건**: 현재 객체 지향 루프에서 실제 성능 병목 또는
   매우 많은 동시 엔터티가 측정되어 ECS 전환 비용을 정당화해야 한다.
 
-현 시점 자료만으로는 B가 가장 적합해 보이지만, `src/`를 변경하기 전
-characterization harness와 사용자 검토를 통과해야 최종 승인을 결정한다.
+사용자는 2026-11-28에 비교 검토를 마치고 아래 조합을 변경 없이 승인했다.
 
-## 제안 결정
+```text
+결정적 Simulation Core
++ 원자적 Command/Transaction
++ 최소 MVC
++ 제한적 Layered/Hexagonal 경계
++ ViewData와 Render Event
+```
 
-선택안 B를 기본안으로 제안한다. 다만 한 번에 대규모 재작성하지 않고 아래
-경계를 한 번에 하나씩 도입한다.
+따라서 이 ADR은 선택안 B의 핵심을 확장한 조합을 수락한다. 이름은 특정 패턴
+프레임워크를 모두 도입한다는 뜻이 아니라, Simulation 중심 상태 소유,
+원자적 거래, 입력·표시 경계, 표현 이벤트라는 필요한 경계만 사용하는 것을
+뜻한다. 구현 세부 계약과 전환 순서는
+[결정적 Simulation Core + Command 아키텍처](002-deterministic-simulation-command-architecture.md)를
+따른다.
+
+## 수락 결정
+
+선택안 B의 핵심을 수락하되, 결정적 Simulation, 제한적 Adapter 경계,
+ViewData와 Render Event를 추가로 명시한다. 한 번에 대규모 재작성하지 않고
+아래 경계를 한 번에 하나씩 도입한다.
 
 1. **Scene/Composition Root**: `main.lua`와 씬이 의존성을 조립한다.
 2. **Controller**: 입력 스냅샷을 `Preview`, `Confirm`, `Cancel`, `StartWave`
@@ -169,10 +184,11 @@ ECS, 전역 Event Bus, 서비스 로케이터는 첫 구현 범위에서 사용�
 
 ## 후속 작업
 
-- [ ] 사용자 검토: A/B/C 비교와 선택 게이트 확인
-- [ ] 선정안에 따른 패턴 경계 승인
-- [ ] `M0`, `M1` 마일스톤에 ADR 의존성 연결
-- [ ] 현재 모듈별 소유 상태와 외부 의존성 표 작성
+- [x] 사용자 검토: A/B/C 및 추가 아키텍처 비교와 선택 게이트 확인
+- [x] 선정안에 따른 패턴 경계 승인
+- [x] 결정적 Simulation, Transaction, ViewData, Render Event 상세 설계 기록
+- [x] `M0` 로드맵에 수락된 ADR 의존성 연결
+- [ ] `M1` characterization 작업 계획에 상세 설계 기준 연결
 - [ ] 첫 리팩터링 전에 characterization harness 작성
 
 ## 재검토 조건
