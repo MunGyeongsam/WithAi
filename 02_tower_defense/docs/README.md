@@ -16,6 +16,7 @@
 | GDD | `design/` | 플레이어 경험, 핵심 루프, 규칙, 콘텐츠, 밸런스의 기획 기준 | 구현 일정이나 세부 코드 설계 |
 | 마일스톤 | `planning/` | 일정 구간에서 달성할 결과와 종료 조건 | 일일 실행 순서나 상세 기술 결정 |
 | 작업 계획 | `planning/` | 한 세션 또는 작업 단위의 범위, 완료 기준, 검증 순서 | 이미 끝난 작업의 사실 기록 |
+| 세션 상태 | `planning/SESSION-STATUS.md` | 세션 간 현재 작업, 우선순위, 차단 요소, 다음 행동 | 실제 변경 이력이나 다음 프롬프트 본문 |
 | ADR | `architecture/` | 중요한 기술 선택의 맥락, 대안, 결과, 근거 | 기능 상세 기획이나 진행 상황 |
 | worklog | `../worklogs/` | 실제 변경, 검증 결과, 결정, 다음 TODO의 세션 기록 | 미래 약속이나 아직 승인되지 않은 방향 |
 
@@ -27,6 +28,7 @@ docs/
 ├── design/
 │   └── gdd-template.md
 ├── planning/
+│   ├── SESSION-STATUS.md
 │   ├── milestone-template.md
 │   └── work-plan-template.md
 ├── architecture/
@@ -43,6 +45,7 @@ docs/
 | GDD | [gdd-template.md](design/gdd-template.md) | `001_2026-11-28_tower-defense-gdd.md` |
 | 마일스톤 | [milestone-template.md](planning/milestone-template.md) | `M1-prototype-playable.md` |
 | 작업 계획 | [work-plan-template.md](planning/work-plan-template.md) | `TD-001-tower-selection-plan.md` |
+| 세션 상태 | [SESSION-STATUS.md](planning/SESSION-STATUS.md) | 고정 파일 |
 | ADR | [adr-template.md](architecture/adr-template.md) | `001-fixed-timestep-policy.md` |
 | worklog | [worklog-template.md](templates/worklog-template.md) | `002_2026-11-28_session.md` |
 
@@ -80,6 +83,8 @@ docs/
 3. 작업 계획에서 현재 한 작업의 파일 범위와 완료 기준을 정한다.
 4. ADR에서 중요한 기술 선택과 대안 폐기 이유를 기록한다.
 5. 구현 후 worklog에 실제 변경, 검증, 결정, 다음 TODO를 남긴다.
+6. `start-session`은 세션 상태와 최신 worklog를 순서대로 읽고, `end-session`은
+   상태 갱신과 새 worklog 작성을 완료한다.
 
 ## 변경 문서 검토
 
