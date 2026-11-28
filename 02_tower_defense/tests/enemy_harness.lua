@@ -88,6 +88,20 @@ local function test_flyer_ignores_path_update()
     print("[PASS] test_flyer_ignores_path_update")
 end
 
+local function test_invalid_path_updates_are_noop()
+    local waypoints = {{x = 0, y = 0}, {x = 100, y = 0}}
+    local e = Enemy.new("normal", waypoints, {x = 0, y = 0}, {x = 100, y = 0})
+
+    e:updatePath(nil)
+    assert(e.waypoints == waypoints)
+    assert(e.waypointIndex == 1)
+
+    e:updatePath({})
+    assert(e.waypoints == waypoints)
+    assert(e.waypointIndex == 1)
+    print("[PASS] test_invalid_path_updates_are_noop")
+end
+
 test_ground_create()
 test_flyer_create()
 test_movement()
@@ -96,4 +110,5 @@ test_damage()
 test_slow()
 test_path_update()
 test_flyer_ignores_path_update()
+test_invalid_path_updates_are_noop()
 print("\n=== All enemy_harness tests passed ===")

@@ -61,8 +61,60 @@ local function test_all_waves()
     print("[PASS] test_all_waves")
 end
 
+local function test_queue_delay_and_completion()
+    local wm = WaveManager.new()
+    local groundWP = {{x = 0, y = 0}, {x = 100, y = 0}}
+    local entry = {x = 0, y = 0}
+    local exit = {x = 100, y = 0}
+
+    assert(wm:startNextWave() == true)
+
+    local first = wm:update(0, groundWP, entry, exit)
+    assert(#first == 1 and first[1].type == "normal")
+    assert(wm:update(0.999, groundWP, entry, exit) == nil)
+
+    local atOneSecond = wm:update(0.001, groundWP, entry, exit)
+    assert(#atOneSecond == 1 and atOneSecond[1].type == "normal")
+    assert(wm:isWaveInProgress() == true)
+    print("[PASS] test_queue_delay_and_completion")
+end
+
+local function test_group_order_and_spawning_completion_tick()
+    local wm = WaveManager.new()
+    local groundWP = {{x = 0, y = 0}, {x = 100, y = 0}}
+    local entry = {x = 0, y = 0}
+    local exit = {x = 100, y = 0}
+
+    assert(wm:startNextWave() == true)
+    wm:update(100, groundWP, entry, exit)
+    assert(wm:isWaveInProgress() == true)
+    assert(wm:update(0, groundWP, entry, exit) == nil)
+    assert(wm:isWaveInProgress() == false)
+    assert(wm:startNextWave() == true)
+
+    local spawned = wm:update(10, groundWP, entry, exit)
+    assert(#spawned == 8)
+
+    local types = {}
+    for i, enemy in ipairs(spawned) do
+        types[i] = enemy.type
+    end
+    assert(table.concat(types, ",") ==
+        "normal,normal,normal,normal,normal,fast,fast,fast")
+    assert(#wm.spawnQueue == 0)
+    assert(wm.spawning == true, "final spawn tick keeps spawning true")
+    assert(wm:isWaveInProgress() == true)
+
+    assert(wm:update(0, groundWP, entry, exit) == nil)
+    assert(wm.spawning == false)
+    assert(wm:isWaveInProgress() == false)
+    print("[PASS] test_group_order_and_spawning_completion_tick")
+end
+
 test_init()
 test_start_wave()
 test_spawn()
 test_all_waves()
+test_queue_delay_and_completion()
+test_group_order_and_spawning_completion_tick()
 print("\n=== All wave_harness tests passed ===")

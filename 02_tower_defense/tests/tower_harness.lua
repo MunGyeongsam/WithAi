@@ -20,6 +20,7 @@ end
 
 local function test_invalid_type()
     assert(Tower.new("invalid", 0, 0) == nil)
+    assert(Tower.getCost("invalid") == 0)
     print("[PASS] test_invalid_type")
 end
 
@@ -61,6 +62,26 @@ local function test_gun_no_air()
     print("[PASS] test_gun_no_air")
 end
 
+local function test_target_range_and_progress_priority()
+    local gun = Tower.new("gun", 100, 100)
+    local outsideRange = {x = 201, y = 100, dead = false, progress = 0.9, flying = false}
+    local lowerProgress = {x = 160, y = 100, dead = false, progress = 0.4, flying = false}
+    local deadLeader = {x = 110, y = 100, dead = true, progress = 1.0, flying = false}
+    local bestTarget = {x = 200, y = 100, dead = false, progress = 0.8, flying = false}
+
+    local projectile = gun:update(0, {
+        outsideRange,
+        lowerProgress,
+        deadLeader,
+        bestTarget,
+    })
+
+    assert(projectile ~= nil)
+    assert(projectile.target == bestTarget, "in-range leader should be targeted")
+    assert(outsideRange.x - gun.x == gun.range + 1)
+    print("[PASS] test_target_range_and_progress_priority")
+end
+
 local function test_slow_tower()
     local t = Tower.new("slow", 100, 100)
     assert(t.slow == 0.4)
@@ -86,6 +107,7 @@ test_invalid_type()
 test_gun_upgrade()
 test_antiair_targeting()
 test_gun_no_air()
+test_target_range_and_progress_priority()
 test_slow_tower()
 test_sell_value()
 print("\n=== All tower_harness tests passed ===")

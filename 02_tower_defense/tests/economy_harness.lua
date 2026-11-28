@@ -23,6 +23,15 @@ local function test_spend()
     print("[PASS] test_spend")
 end
 
+local function test_failed_spend_is_unchanged()
+    local eco = Economy.new(40, 10)
+    assert(eco:spend(41) == false)
+    assert(eco:getGold() == 40)
+    assert(eco.totalEarned == 40)
+    assert(eco.totalSpent == 0)
+    print("[PASS] test_failed_spend_is_unchanged")
+end
+
 local function test_earn()
     local eco = Economy.new(100, 10)
     eco:earn(50)
@@ -42,6 +51,7 @@ end
 
 test_initial()
 test_spend()
+test_failed_spend_is_unchanged()
 test_earn()
 test_lives()
 print("\n=== All economy_harness tests passed ===")
