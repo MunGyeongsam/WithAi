@@ -2,7 +2,7 @@
 
 > 상태 문서 버전: 1
 > 최종 갱신: 2026-11-28
-> 기준 worklog: [018_2026-11-28_session.md](../../worklogs/018_2026-11-28_session.md)
+> 기준 worklog: [019_2026-11-28_session.md](../../worklogs/019_2026-11-28_session.md)
 > 관리 상태: 운영 중
 
 ## 목적
@@ -34,7 +34,8 @@
 | TD-PLAN-001 | 구현 마일스톤·작업 분해 | 완료 | P0 | TD-ARCH-001 승인 | [M1 characterization 계획](TD-PLAN-001-M1-characterization-plan.md) | 다음 구현 세션에서 `TD-M1-001`을 실행한다. |
 | TD-M1-001 | M1 characterization harness 구현 | 완료 | P0 | TD-PLAN-001 완료 | [M1 마일스톤](M1-characterization-harness.md), [실행 계획](TD-PLAN-001-M1-characterization-plan.md), `017_2026-11-28_session.md` | M2 착수 계획으로 인계한다. |
 | TD-PLAN-002 | M2 경로 편집 원자성 착수 계획 | 완료 | P0 | TD-M1-001 완료 | [M2 마일스톤](M2-path-edit-atomicity.md), [착수 계획](TD-PLAN-002-M2-path-edit-atomicity-plan.md), `018_2026-11-28_session.md` | 다음 구현 세션에서 TD-M2-001 최소 Command 경계를 실행한다. |
-| TD-M2-001 | 최소 GameState·CommandResult·CommandProcessor 경계 | 대기 | P0 | TD-PLAN-002 완료 | [M2 마일스톤](M2-path-edit-atomicity.md), [TD-PLAN-002](TD-PLAN-002-M2-path-edit-atomicity-plan.md) | FIFO 처리와 성공·거절 결과의 headless 계약을 한 세션으로 구현한다. |
+| TD-M2-001 | 최소 GameState·CommandResult·CommandProcessor 경계 | 완료 | P0 | TD-PLAN-002 완료 | [M2 마일스톤](M2-path-edit-atomicity.md), [TD-PLAN-002](TD-PLAN-002-M2-path-edit-atomicity-plan.md), `019_2026-11-28_session.md` | 첫 `PLACE_WALL` Transaction 작업으로 인계한다. |
+| TD-M2-002 | 첫 PLACE_WALL Transaction | 대기 | P0 | TD-M2-001 완료 | [M2 마일스톤](M2-path-edit-atomicity.md), [TD-PLAN-002](TD-PLAN-002-M2-path-edit-atomicity-plan.md) | 빈 적 목록 기준 preview/commit/reject 원자성과 M1 회귀를 구현한다. |
 | TD-004 | 레벨별 웨이브 데이터와 검증 | 대기 | P1 | M1~M3 완료 | [GDD](../design/001_2026-11-28_tower-defense-gdd.md), `009_2026-11-28_session.md` | 확정된 데이터·실행 경계를 따라 6/7/8웨이브를 구현 |
 
 ### 상태 정의
@@ -51,14 +52,14 @@
 
 ## 다음 세션
 
-- 우선 작업: `TD-M2-001`
-- 작업 형태: 최소 GameState·CommandResult·FIFO CommandProcessor 구현
+- 우선 작업: `TD-M2-002`
+- 작업 형태: 첫 `PLACE_WALL` preview/commit/reject Transaction 구현
 - 현재 차단 요소: 없음
-- 시작 프롬프트 원본: [018_2026-11-28_session.md](../../worklogs/018_2026-11-28_session.md)의
+- 시작 프롬프트 원본: [019_2026-11-28_session.md](../../worklogs/019_2026-11-28_session.md)의
   `다음 세션 프롬프트`
-- 예상 수정 범위: 새 Simulation/Command 계약 파일, `tests/model/` 하네스,
-  필요 시 runner와 상태·새 worklog
-- 기본 제외 범위: 경로 Transaction, 기존 gameplay/module 동작, 밸런스, UI·입력
+- 예상 수정 범위: 새 Transaction 계약 파일, `tests/model/` 하네스,
+  M2 검증 연결과 상태·새 worklog
+- 기본 제외 범위: 적 합류, 타워 배치, 기존 Scene/UI 연결, 밸런스, 입력·렌더링
 
 ## start-session 절차
 

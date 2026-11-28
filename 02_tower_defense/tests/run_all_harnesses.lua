@@ -19,6 +19,7 @@ local harnesses = {
     "wave_harness.lua",
     "data/levels_harness.lua",
     "scenes/gameplay_scene_harness.lua",
+    "model/command_processor_harness.lua",
 }
 
 local function quote(value)
